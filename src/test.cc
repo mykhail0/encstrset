@@ -2,8 +2,8 @@
 #include <iostream>
 
 int main() {
-    char x[] = "wartość";
-    char y[] = "klucz";
+    char x[] = "bar";
+    char y[] = "5X";
     std::cout << cypher(y, x) << std::endl;
     return 0;
 }

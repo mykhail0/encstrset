@@ -3,12 +3,6 @@
 
 #include <cstdlib>
 
-// temporary, to be removed
-#include <string>
-
-std::string cypher(const char *key, const char *value);
-// end of to be removed
-
 /*
       Tworzy nowy zbiór i zwraca jego identyfikator.
 */
