@@ -1,6 +1,16 @@
+#ifndef ENCSTRSET_H
+#define ENCSTRSET_H
+
+#include <cstdlib>
+
+// temporary, to be removed
+#include <string>
+
+std::string cypher(const char *key, const char *value);
+// end of to be removed
+
 /*
       Tworzy nowy zbiór i zwraca jego identyfikator.
-
 */
 unsigned long encstrset_new();
 
@@ -53,3 +63,5 @@ void encstrset_clear(unsigned long id);
     dst_id, a w przeciwnym przypadku nic nie robi.
 */
 void encstrset_copy(unsigned long src_id, unsigned long dst_id);
+
+#endif /* ENCSTRSET_H */

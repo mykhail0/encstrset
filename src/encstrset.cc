@@ -1,6 +1,10 @@
+#include "encstrset.h"
+
 #include <unordered_set>
 #include <unordered_map>
 #include <iostream>
+#include <stdexcept>
+#include <cassert>
 
 using encstrset = std::unordered_set<std::string>;
 using set_map = std::unordered_map<unsigned long, encstrset>;
@@ -15,17 +19,37 @@ set_map m_set_map = set_map();
 //TODO opakować m_set_map w funkcję (zmienna globalna, initialization order fiasco)
 //TODO iostream i zmienne globalne cerr i cout (peczar na labach mówił że też mogą być jakieś problemy
 
-
-std::string cypher(const char *key, const char *value);
+// Increments pointer to C-string cyclically.
+// Highly unsafe, use at your own risk.
+size_t increment_Cstr_ptr(size_t ptr, const char *s) {
+    ++ptr;
+    if (s[ptr] == '\0')
+        return 0;
+    return ptr;
+}
 
 /*
-      Jeżeli istnieje zbiór o identyfikatorze id i element value po
-      zaszyfrowaniu kluczem key nie należy do tego zbioru, to dodaje ten
-      zaszyfrowany element do zbioru, a w przeciwnym przypadku nie robi nic.
-      Szyfrowanie jest symetryczne, za pomocą operacji bitowej XOR. Gdy klucz
-      key jest krótszy od value, to należy go cyklicznie powtórzyć. Wynikiem
-      jest true, gdy element został dodany, a false w przeciwnym przypadku.
+    Parametr value o wartości NULL jest niepoprawny. Z kolei wartość NULL parametru
+    key lub pusty napis key oznaczają brak szyfrowania.
+    Assumes C-strings are null-terminated.
+If the resulting string length would exceed the max_size, a length_error exception is thrown.
+A bad_alloc exception is thrown if the function fails when attempting to allocate storage.
 */
+std::string cypher(const char *key, const char *value) {
+    // Will remove possibly. If removed without being replaced with
+    // an equivalent assertion will cause UB.
+    if (value == nullptr)
+        throw std::invalid_argument("value is null");
+
+    std::string ans(value);
+    size_t ptr = 0;
+    for (char& c : ans) {
+        c = c ^ key[ptr];
+        ptr = increment_Cstr_ptr(ptr, key);
+    }
+    return ans;
+}
+
 bool encstrset_insert(unsigned long id, const char *value, const char *key) {
     if (value == nullptr)
         return false;
@@ -44,12 +68,6 @@ bool encstrset_insert(unsigned long id, const char *value, const char *key) {
     return true;
 }
 
-/*
-      Jeżeli istnieje zbiór o identyfikatorze id i element value zaszyfrowany
-      kluczem key należy do tego zbioru, to usuwa element ze zbioru, a w
-      przeciwnym przypadku nie robi nic. Wynikiem jest true, gdy element został
-      usunięty, a false w przeciwnym przypadku.
-*/
 bool encstrset_remove(unsigned long id, const char *value, const char *key) {
     if (value == nullptr)
         return false;
@@ -70,11 +88,6 @@ bool encstrset_remove(unsigned long id, const char *value, const char *key) {
     return true;
 }
 
-/*
-      Jeżeli istnieje zbiór o identyfikatorze id i element value zaszyfrowany
-      kluczem key należy do tego zbioru, to zwraca true, a w przeciwnym
-      przypadku zwraca false.
-*/
 bool encstrset_test(unsigned long id, const char *value, const char *key) {
     if (value == nullptr)
         return false;
@@ -96,11 +109,7 @@ static void add_all(const encstrset &src, encstrset &dst) {
             dst.insert(str);
     }
 }
-/*
-    Jeżeli istnieją zbiory o identyfikatorach src_id oraz dst_id, to kopiuje
-    zawartość zbioru o identyfikatorze src_id do zbioru o identyfikatorze
-    dst_id, a w przeciwnym przypadku nic nie robi.
-*/
+
 void encstrset_copy(unsigned long src_id, unsigned long dst_id) {
     auto src_it = m_set_map.find(src_id);
     if (src_it == m_set_map.end())
