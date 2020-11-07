@@ -5,10 +5,54 @@
 #include <unordered_map>
 #include <iostream>
 
+static std::string NULL_STRING = "NULL";
+
 using encstrset = std::unordered_set<std::string>;
 using set_map = std::unordered_map<unsigned long, encstrset>;
 
 static unsigned long largest_id;
+
+template<typename T>
+void tprintf(T format) {
+    std::cout << format;
+}
+
+template<typename T, typename... Targs>
+void tprintf(T value, Targs... Fargs) { // recursive variadic function
+    std::cout << value << ", ";
+    tprintf(Fargs...); // recursive call
+}
+
+template<typename... Targs>
+void print_brackets(Targs... Fargs) {
+    std::cout << "(";
+    tprintf(Fargs...);
+    std::cout << ")";
+}
+
+template <typename ... Targs>
+std::string print_func_info(const std::string &func_name, Targs... Fargs) {
+    std::cout << func_name << ": ";
+    tprintf(Fargs...);
+    std::cout << std::endl;
+}
+
+template<typename... Targs>
+void print_func(const std::string &func_name, Targs... Fargs) {
+    std::cout << func_name;
+    print_brackets(Fargs...);
+    std::cout << std::endl;
+}
+
+std::string set_repr(unsigned long id) {
+    return "set #" + std::to_string(id);
+}
+
+std::string param_str(const char *p) {
+    if (p == nullptr)
+        return NULL_STRING;
+    return "\"" + std::string(p) + "\"";
+}
 
 set_map m_set_map = set_map();
 
@@ -99,6 +143,7 @@ static void add_all(const encstrset &src, encstrset &dst) {
             dst.insert(str);
     }
 }
+
 /*
     Jeżeli istnieją zbiory o identyfikatorach src_id oraz dst_id, to kopiuje
     zawartość zbioru o identyfikatorze src_id do zbioru o identyfikatorze
@@ -114,4 +159,3 @@ void encstrset_copy(unsigned long src_id, unsigned long dst_id) {
 
     add_all(src_it->second, dst_it->second);
 }
-
