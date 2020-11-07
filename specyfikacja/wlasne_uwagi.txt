@@ -1,0 +1,1 @@
+1) Const w arg-ach i w zwracanych typach
