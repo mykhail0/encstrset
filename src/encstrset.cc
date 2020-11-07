@@ -1,6 +1,3 @@
-//Uwagi:
-//Const w arg-ach i w zwracanych typach
-
 #include <unordered_set>
 #include <unordered_map>
 #include <iostream>
