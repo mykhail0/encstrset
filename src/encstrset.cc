@@ -53,44 +53,41 @@ namespace {
 
     unsigned long largest_id = 0;
 
-    // Increments pointer to C-string's contents cyclically.
-    size_t increment_Cstr_ptr(size_t ptr, const char *s) {
-        ++ptr;
-        if (s[ptr] == '\0')
-            return 0;
-        return ptr;
+    std::ostream &get_cerr() {
+        static std::ios_base::Init init;
+        return std::cerr;
     }
 
     template<typename T>
     void tprintf(T format) {
-        std::cout << format;
+        get_cerr() << format;
     }
 
     template<typename T, typename... Targs>
     void tprintf(T value, Targs... Fargs) { // recursive variadic function
-        std::cout << value << ", ";
+        get_cerr() << value << ", ";
         tprintf(Fargs...); // recursive call
     }
 
     template<typename... Targs>
     void print_brackets(Targs... Fargs) {
-        std::cout << "(";
+        get_cerr() << "(";
         tprintf(Fargs...);
-        std::cout << ")";
+        get_cerr() << ")";
     }
 
     template<typename ... Targs>
     void print_func_info(const std::string &func_name, Targs... Fargs) {
-        std::cout << func_name << ": ";
+        get_cerr() << func_name << ": ";
         tprintf(Fargs...);
-        std::cout << std::endl;
+        get_cerr() << std::endl;
     }
 
     template<typename... Targs>
     void print_func(const std::string &func_name, Targs... Fargs) {
-        std::cout << func_name;
+        get_cerr() << func_name;
         print_brackets(Fargs...);
-        std::cout << std::endl;
+        get_cerr() << std::endl;
     }
 
     std::string set_str(unsigned long id) {
@@ -116,6 +113,14 @@ namespace {
         return *m_set_map_ptr;
     }
 
+    // Increments pointer to C-string's contents cyclically.
+    size_t increment_Cstr_ptr(size_t ptr, const char *s) {
+        ++ptr;
+        if (s[ptr] == '\0')
+            return 0;
+        return ptr;
+    }
+
     /*
         Parametr value o wartości NULL jest niepoprawny. Z kolei wartość NULL parametru
         key lub pusty napis key oznaczają brak szyfrowania.
@@ -137,16 +142,6 @@ namespace {
             ptr = increment_Cstr_ptr(ptr, key);
         }
         return ans;
-    }
-
-    std::ostream &get_cerr() {
-        static std::ios_base::Init init;
-        return std::cerr;
-    }
-
-    std::ostream &get_cout() {
-        static std::ios_base::Init init;
-        return std::cout;
     }
 }
 
