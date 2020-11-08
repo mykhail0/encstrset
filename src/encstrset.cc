@@ -94,7 +94,8 @@ namespace {
         std::ostringstream ret;
         for (const char &c : s)
             // https://stackoverflow.com/a/3381629
-            ret << std::hex << std::setfill('0') << std::setw(2) << std::uppercase << (int) c;
+            ret << std::hex << std::setfill('0')
+                << std::setw(2) << std::uppercase << (int) c;
         return ret.str();
     }
 
@@ -124,7 +125,8 @@ namespace {
             if (*it == '%') {
                 get_cerr() << value;
                 //TODO Czy taki sposób iterowania po stringu jest dobry
-                tprintf(&(format[it - format.begin() + 1]), Fargs...); // recursive cal
+                // recursive cal
+                tprintf(&(format[it - format.begin() + 1]), Fargs...);
                 return;
             }
             get_cerr() << *it;
@@ -138,21 +140,17 @@ namespace {
     }
 
     // Adds elements from src to dst.
-    void add_all(const encstrset &src, encstrset &dst, unsigned long src_id, unsigned long dst_id) {
+    void add_all(const encstrset &src, encstrset &dst,
+                 unsigned long src_id, unsigned long dst_id) {
         //TODO czy takie iterowanie jest dobre, czy powinno zależeć od debug
         for (auto str : src) {
             if (dst.find(str) == dst.end()) {
                 dst.insert(str);
-                tprintf(formats::CYPHER_COPIED(),
-                        __func__,
-                        str_to_hex(str),
-                        src_id,
-                        dst_id);
+                tprintf(formats::COPIED(),
+                        __func__, str_to_hex(str), src_id, dst_id);
             } else {
                 tprintf(formats::COPIED_PRESENT(),
-                        __func__,
-                        str_to_hex(str),
-                        dst_id);
+                        __func__, str_to_hex(str), dst_id);
             }
 
         }
@@ -167,12 +165,15 @@ namespace {
     }
 
     /*
-        Parametr value o wartości NULL jest niepoprawny. Z kolei wartość NULL parametru
+        Parametr value o wartości NULL jest niepoprawny.
+        Z kolei wartość NULL parametru
         key lub pusty napis key oznaczają brak szyfrowania.
 
         Assumes C-strings are null-terminated.
-        If the resulting string length would exceed the max_size, a length_error exception is thrown.
-        A bad_alloc exception is thrown if the function fails when attempting to allocate storage.
+        If the resulting string length would exceed the max_size,
+        a length_error exception is thrown.
+        A bad_alloc exception is thrown if the function fails
+        when attempting to allocate storage.
     */
     std::string cypher(const char *key, const char *value) {
         // Will remove possibly. If removed without being replaced with
@@ -197,7 +198,7 @@ unsigned long jnp1::encstrset_new() {
     ++largest_id;
     m_set_map()[ans] = encstrset();
 
-    tprintf("%: set #%\n", __func__, ans);
+    tprintf(formats::CREATED(), __func__, ans);
     return ans;
 }
 
@@ -216,12 +217,9 @@ size_t jnp1::encstrset_size(unsigned long id) {
     return it->second.size();
 }
 
-bool jnp1::encstrset_insert(unsigned long id, const char *value, const char *key) {
-    tprintf("%(%, %, %)\n",
-            __func__,
-            id,
-            param_str(value),
-            param_str(key));
+bool jnp1::encstrset_insert(unsigned long id,
+                            const char *value, const char *key) {
+    tprintf("%(%, %, %)\n", __func__, id, param_str(value), param_str(key));
 
     if (value == nullptr) {
         tprintf(formats::INVALID_VALUE(), __func__, param_str(value));
@@ -239,9 +237,7 @@ bool jnp1::encstrset_insert(unsigned long id, const char *value, const char *key
 
     if (m_set.find(cyphered_val) != m_set.end()) {
         tprintf(formats::CYPHER_WAS_PRESENT(),
-                __func__,
-                id,
-                str_to_hex(cyphered_val));
+                __func__, id, str_to_hex(cyphered_val));
         return false;
     }
 
