@@ -5,6 +5,7 @@
 #include <stdexcept>
 #include <iostream>
 #include <iomanip>
+#include <cstring>
 
 namespace {
 #ifdef NDEBUG
@@ -108,7 +109,7 @@ namespace {
 
     // Returns uppercase hex representation of a string
     std::string str_to_hex(const std::string &s) {
-        // TODO Jeśli zaszyfrowane to co robić?
+        // TODO Jeśli puste to co robić?
         if (s.empty())
             return s;
 
@@ -203,6 +204,10 @@ namespace {
             throw std::invalid_argument("value is null");
 
         std::string ans(value);
+
+        if (key == nullptr || strcmp(key, "") == 0)
+            return ans;
+
         size_t ptr = 0;
         for (char &c : ans) {
             //TODO Clang wywala warning, o co chodzi?
