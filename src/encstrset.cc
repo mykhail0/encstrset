@@ -105,22 +105,6 @@ namespace {
     }
 
     //TODO zastanowić się czy to dobrze
-        static const std::string does_not_exist("%: set #% does not exist \n");
-        return does_not_exist;
-    }
-
-
-    unsigned long largest_id = 0;
-
-    std::string str_to_hex(const std::string &s) {
-        std::ostringstream ret;
-        for (const char &c : s)
-            // https://stackoverflow.com/a/3381629
-            ret << std::hex << std::setfill('0') << std::setw(2) << std::uppercase << (int) c;
-        return ret.str();
-    }
-
-    //TODO zastanowić się czy to dobrze
     std::ostream &get_cerr() {
         static std::ios_base::Init init;
         return std::cerr;
@@ -182,12 +166,6 @@ namespace {
             // https://stackoverflow.com/a/3381629
             ret << std::hex << std::setfill('0') << std::setw(2) << std::uppercase << (int) c;
         return ret.str();
-    }
-
-    // Increments pointer to C-string's contents cyclically.
-    set_map &m_set_map() {
-        static set_map *m_set_map_ptr = new set_map();
-        return *m_set_map_ptr;
     }
 
     // Increments pointer to C-string's contents cyclically.
