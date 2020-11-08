@@ -25,7 +25,12 @@ namespace {
     }
 
     std::string CYPHER_WAS_PRESENT() {
-        static const std::string was_already_present("%: set #%, cypher \"%\" was_already_present\n");
+        static const std::string was_already_present("%: set #%, cypher \"%\" was already present\n");
+        return was_already_present;
+    }
+
+    std::string CYPHER_WAS_NOT_PRESENT() {
+        static const std::string was_already_present("%: set #%, cypher \"%\" was not present\n");
         return was_already_present;
     }
 
@@ -49,10 +54,10 @@ namespace {
         return cypher_str;
     }
 
-std::string SET_DOES_NOT_EXIST() {
+    std::string SET_DOES_NOT_EXIST() {
         static const std::string does_not_exist("%: set #% does not exist \n");
-        return does_not_exist;    
-}
+        return does_not_exist;
+    }
 
     std::string CREATED() {
         static const std::string created("created");
@@ -67,11 +72,15 @@ std::string SET_DOES_NOT_EXIST() {
     }
 
     void tprintf(const std::string &format) {
+        if (!debug)
+            return;
         get_cerr() << format;
     }
 
     template<typename T, typename... Targs>
     void tprintf(const std::string &format, T value, Targs... Fargs) {
+        if (!debug)
+            return;
         for (auto it = format.cbegin(); it < format.cend(); it++) {
             if (*it == '%') {
                 get_cerr() << value;
@@ -91,11 +100,23 @@ std::string SET_DOES_NOT_EXIST() {
 
     std::string str_to_hex(const std::string &s);
 
-    void add_all(const encstrset &src, encstrset &dst) {
+    void add_all(const encstrset &src, encstrset &dst, unsigned long src_id, unsigned long dst_id) {
         //TODO czy takie iterowanie jest dobre, czy powinno zależeć od debug
         for (auto str : src) {
-            if (dst.find(str) == dst.end())
+            if (dst.find(str) == dst.end()) {
                 dst.insert(str);
+                tprintf("%: copied cypher \"%\" from set #% to set #%\n",
+                        __func__,
+                        str_to_hex(str),
+                        src_id,
+                        dst_id);
+            } else {
+                tprintf("%: cypher \"%\" was already present in set #%\n",
+                        __func__,
+                        str_to_hex(str),
+                        dst_id);
+            }
+
         }
     }
 
@@ -165,15 +186,14 @@ size_t jnp1::encstrset_size(unsigned long id) {
 }
 
 bool jnp1::encstrset_insert(unsigned long id, const char *value, const char *key) {
-    if (debug)
-        tprintf("%(%, %, %)\n",
-                __func__,
-                id,
-                param_str(value),
-                param_str(key));
+
+    tprintf("%(%, %, %)\n",
+            __func__,
+            id,
+            param_str(value),
+            param_str(key));
 
     if (value == nullptr) {
-        //TODO czy robić to w ten sposób czy przedefiniować formatyy
         tprintf(INVALID_VALUE(), __func__, param_str(value));
         return false;
     }
@@ -188,58 +208,95 @@ bool jnp1::encstrset_insert(unsigned long id, const char *value, const char *key
     std::string cyphered_val = cypher(key, value);
 
     if (m_set.find(cyphered_val) != m_set.end()) {
-        if (debug) {
-            tprintf(CYPHER_WAS_PRESENT(),
-                    __func__,
-                    id,
-                    str_to_hex(cyphered_val));
-        }
+        tprintf(CYPHER_WAS_PRESENT(),
+                __func__,
+                id,
+                str_to_hex(cyphered_val));
         return false;
     }
 
     m_set.insert(cyphered_val);
 
-    if (debug) {
-        tprintf("%: set #%, cypher \"%\" inserted\n",
-                __func__,
-                id,
-                str_to_hex(cyphered_val));
-    }
+    tprintf("%: set #%, cypher \"%\" inserted\n",
+            __func__,
+            id,
+            str_to_hex(cyphered_val));
+
     return true;
 }
 
 bool jnp1::encstrset_remove(unsigned long id, const char *value, const char *key) {
-    if (value == nullptr)
+    tprintf("%(%, %, %)\n",
+            __func__,
+            id,
+            param_str(value),
+            param_str(key));
+
+    if (value == nullptr) {
+        tprintf(INVALID_VALUE(), __func__, param_str(value));
         return false;
+    }
 
     auto it = m_set_map().find(id);
-    if (it == m_set_map().end())
+    if (it == m_set_map().end()) {
+        tprintf(SET_DOES_NOT_EXIST(), __func__, id);
         return false;
+    }
 
     std::string cyphered_val = cypher(key, value);
 
     encstrset &m_set = it->second;
 
     auto set_it = m_set.find(cyphered_val);
-    if (set_it == m_set.end())
+    if (set_it == m_set.end()) {
+        tprintf(CYPHER_WAS_NOT_PRESENT(), __func__, value, str_to_hex(cyphered_val));
         return false;
+    }
 
     m_set.erase(set_it);
+
+    tprintf("%: set #%, cypher \"%\" removed\n",
+            __func__,
+            id,
+            str_to_hex(cyphered_val));
+
     return true;
 }
 
 bool jnp1::encstrset_test(unsigned long id, const char *value, const char *key) {
-    if (value == nullptr)
+    tprintf("%(%, %, %)\n",
+            __func__,
+            id,
+            param_str(value),
+            param_str(key));
+
+    if (value == nullptr) {
+        tprintf(INVALID_VALUE(), __func__, param_str(value));
         return false;
+    }
 
     auto it = m_set_map().find(id);
-    if (it == m_set_map().end())
+    if (it == m_set_map().end()) {
+        tprintf(SET_DOES_NOT_EXIST(), __func__, id);
         return false;
+    }
 
     std::string cyphered_val = cypher(key, value);
 
     const encstrset &m_set = it->second;
-    return m_set.find(cyphered_val) != m_set.end();
+    if (m_set.find(cyphered_val) == m_set.end()) {
+        tprintf("%: set #%, cypher \"%\" is not present\n",
+                __func__,
+                id,
+                str_to_hex(cyphered_val));
+        return false;
+    }
+    tprintf("%: set #%, cypher \"%\" is present\n",
+            __func__,
+            id,
+            str_to_hex(cyphered_val));
+    return true;
+
 }
 
 void jnp1::encstrset_clear(unsigned long id) {
@@ -250,12 +307,20 @@ void jnp1::encstrset_clear(unsigned long id) {
 }
 
 void jnp1::encstrset_copy(unsigned long src_id, unsigned long dst_id) {
+    tprintf("%(%, %)\n",
+            __func__,
+            src_id,
+            dst_id);
     auto src_it = m_set_map().find(src_id);
-    if (src_it == m_set_map().end())
+    if (src_it == m_set_map().end()) {
+        tprintf(SET_DOES_NOT_EXIST(), __func__, src_id);
         return;
+    }
     auto dst_it = m_set_map().find(dst_id);
-    if (dst_it == m_set_map().end())
+    if (dst_it == m_set_map().end()) {
+        tprintf(SET_DOES_NOT_EXIST(), __func__, dst_id);
         return;
+    }
 
-    add_all(src_it->second, dst_it->second);
+    add_all(src_it->second, dst_it->second, src_id, dst_id);
 }
