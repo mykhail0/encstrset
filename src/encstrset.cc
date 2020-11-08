@@ -24,12 +24,12 @@ namespace {
         }
 
         std::string INSERTED() {
-            static const std::string inserted("%: set #%, cypher \% inserted\n");
+            static const std::string inserted("%: set #%, cypher \"%\" inserted\n");
             return inserted;
         }
 
         std::string SET_CREATED() {
-            static const std::string set_created("%: set #\% created\n");
+            static const std::string set_created("%: set #% created\n");
             return set_created;
         }
 
@@ -49,7 +49,7 @@ namespace {
         }
 
         std::string COPIED_PRESENT() {
-            static const std::string copied_present("%: copied cypher % was already present in set #%\n");
+            static const std::string copied_present("%: copied cypher \"%\" was already present in set #%\n");
             return copied_present;
         }
 
@@ -69,7 +69,7 @@ namespace {
         }
 
         std::string CYPHER_COPIED() {
-            static const std::string set_copied("%: cypher % copied from set #% to set #%\n");
+            static const std::string set_copied("%: cypher \"%\" copied from set #% to set #%\n");
             return set_copied;
         }
 
@@ -84,7 +84,8 @@ namespace {
         }
 
         std::string REMOVE() {
-            static const std::string remove("%: set #%, cypher % removed\n");
+            static const std::string remove("%: set #%, cypher \"%\" removed\n");
+            return remove;
         }
     }
 
@@ -250,7 +251,7 @@ bool jnp1::encstrset_insert(unsigned long id, const char *value, const char *key
 
     m_set.insert(cyphered_val);
 
-    tprintf("%: set #%, cypher \"%\" inserted\n",
+    tprintf(formats::INSERTED(),
             __func__,
             id,
             str_to_hex(cyphered_val));
@@ -288,7 +289,7 @@ bool jnp1::encstrset_remove(unsigned long id, const char *value, const char *key
 
     m_set.erase(set_it);
 
-    tprintf("%: set #%, cypher \"%\" removed\n",
+    tprintf(formats::REMOVE(),
             __func__,
             id,
             str_to_hex(cyphered_val));
