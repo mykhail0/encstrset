@@ -214,17 +214,26 @@ unsigned long jnp1::encstrset_new() {
 
 void jnp1::encstrset_delete(unsigned long id) {
     tprintf("%(%)\n", __func__, id);
+    auto prev_size = m_set_map().size();
+
     m_set_map().erase(id);
     if (id != 0 && id == largest_id - 1)
         --largest_id;
+
+    if (prev_size != m_set_map().size())
+        tprintf(DELETED(), __func__, id);
 }
 
 size_t jnp1::encstrset_size(unsigned long id) {
     auto it = m_set_map().find(id);
-    if (it == m_set_map().end())
+    if (it == m_set_map().end()) {
+        tprintf(DOES_NOT_EXIST(), __func__, id);
         return 0;
+    }
 
-    return it->second.size();
+    auto ans = it->second.size();
+    tprintf(SIZE(), __func__, id, ans);
+    return ans;
 }
 
 bool jnp1::encstrset_insert(unsigned long id,
