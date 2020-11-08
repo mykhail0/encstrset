@@ -1,4 +1,4 @@
-#include "encstrset.h"
+#include "../src/encstrset.h"
 
 #include <assert.h>
 #include <stdio.h>

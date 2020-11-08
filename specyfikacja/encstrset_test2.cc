@@ -1,4 +1,4 @@
-#include "encstrset.h"
+#include "../src/encstrset.h"
 
 #ifdef NDEBUG
     #undef NDEBUG

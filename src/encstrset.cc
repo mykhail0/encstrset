@@ -188,7 +188,6 @@ size_t jnp1::encstrset_size(unsigned long id) {
 }
 
 bool jnp1::encstrset_insert(unsigned long id, const char *value, const char *key) {
-
     tprintf("%(%, %, %)\n",
             __func__,
             id,
