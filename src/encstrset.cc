@@ -3,13 +3,14 @@
 #include <unordered_map>
 #include <stdexcept>
 #include <iostream>
+#include <iomanip>
 
 namespace {
-#ifdef NDEBUG
+  #ifdef NDEBUG
     constexpr bool debug = false;
-#else
+  #else
     constexpr bool debug = true;
-#endif
+  #endif
 
     using encstrset = std::unordered_set<std::string>;
     using set_map = std::unordered_map<unsigned long, encstrset>;
@@ -19,17 +20,22 @@ namespace {
         return null_string;
     }
 
-    std::string INSERTED() {
-        static const std::string inserted("inserted");
-        return inserted;
+    std::string SET_CREATED() {
+        static const std::string set_created("%: set #\% created\n");
+        return set_created;
     }
 
-    std::string CYPHER_WAS_PRESENT() {
+    std::string CYPHER_WAS_PRESENT
         static const std::string was_already_present("%: set #%, cypher \"%\" was already present\n");
         return was_already_present;
     }
 
-    std::string CYPHER_WAS_NOT_PRESENT() {
+	  std::string CYPHER_WAS_NOT_PRESENT() {
+        static const std::string was_already_present("%: set #%, cypher \"%\" was not present\n");
+        return was_already_present;
+    }	
+
+ std::string CYPHER_WAS_NOT_PRESENT() {
         static const std::string was_already_present("%: set #%, cypher \"%\" was not present\n");
         return was_already_present;
     }
@@ -42,25 +48,21 @@ namespace {
     std::string IS_NOT_PRESENT() {
         static const std::string is_present("is not present");
         return is_present;
-    }
-
-    std::string INVALID_VALUE() {
+    }    std::string INVALID_VALUE() {
         static const std::string invalid_value("%: invalid value (%)\n");
         return invalid_value;
     }
 
-    std::string CYPHER() {
-        static const std::string cypher_str("cypher");
-        return cypher_str;
-    }
-
-    std::string SET_DOES_NOT_EXIST() {
-        static const std::string does_not_exist("%: set #% does not exist \n");
-        return does_not_exist;
-    }
-
+static const std::string does_not_exist("%: set #% does not exist \n");
+        return does_not_exist;    
+}
     std::string CREATED() {
         static const std::string created("created");
+        return does_not_exist;    
+
+
+
+
     }
 
     unsigned long largest_id = 0;
@@ -97,12 +99,10 @@ namespace {
             return NULL_STRING();
         return "\"" + std::string(p) + "\"";
     }
-
-    std::string str_to_hex(const std::string &s);
-
     void add_all(const encstrset &src, encstrset &dst, unsigned long src_id, unsigned long dst_id) {
         //TODO czy takie iterowanie jest dobre, czy powinno zależeć od debug
         for (auto str : src) {
+        
             if (dst.find(str) == dst.end()) {
                 dst.insert(str);
                 tprintf("%: copied cypher \"%\" from set #% to set #%\n",
@@ -123,6 +123,14 @@ namespace {
     set_map &m_set_map() {
         static set_map *m_set_map_ptr = new set_map();
         return *m_set_map_ptr;
+    }
+
+    std::string str_to_hex(const std::string& s) {
+        std::ostringstream ret;
+        for (const char& c : s)
+            // https://stackoverflow.com/a/3381629
+            ret << std::hex << std::setfill('0') << std::setw(2) << std::uppercase << (int) c;
+        return ret.str();
     }
 
     // Increments pointer to C-string's contents cyclically.
