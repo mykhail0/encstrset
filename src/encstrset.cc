@@ -5,6 +5,77 @@
 #include <iostream>
 #include <iomanip>
 
+namespace formats {
+    std::string NULL_STRING() {
+        static const std::string null_string("NULL");
+        return null_string;
+    }
+
+    std::string INSERTED() {
+        static const std::string inserted("%: set #%, cypher \% inserted\n");
+        return inserted;
+    }
+
+    std::string SET_CREATED() {
+        static const std::string set_created("%: set #\% created\n");
+        return set_created;
+    }
+
+    std::string CYPHER_IS_PRESENT() {
+        static const std::string is_present("%: set #%, cypher \"%\" is present\n");
+        return is_present;
+    }
+
+    std::string CYPHER_IS_NOT_PRESENT() {
+        static const std::string is_not_present("%: set #%, cypher \"%\" is not present\n");
+        return is_not_present;
+    }
+
+    std::string CYPHER_WAS_PRESENT() {
+        static const std::string was_already_present("%: set #%, cypher \"%\" was already present\n");
+        return was_already_present;
+    }
+
+    std::string CYPHER_WAS_NOT_PRESENT() {
+        static const std::string was_not_present("%: set #%, cypher \"%\" was not present in set #%\n");
+        return was_not_present;
+    }
+
+    std::string INVALID_VALUE() {
+        static const std::string invalid_value("%: invalid value (%)\n");
+        return invalid_value;
+    }
+
+    std::string SET_DOES_NOT_EXIST() {
+        static const std::string does_not_exist("%: set #\% does not exist\n");
+        return does_not_exist;    
+    }
+
+    std::string SET_COPIED() {
+        static const std::string set_copied("%: cypher \% copied from set #\% to set #%\n");
+        return set_copied;
+    }
+
+    std::string COPIED_PRESENT() {
+        static const std::string copied_present("%: copied cypher % was already present in set #%\n");
+        return copied_present;
+    }
+
+    std::string SET_DELETED() {
+        static const std::string set_deleted("%: set#\% deleted\n");
+        return set_deleted;
+    }
+
+    std::string SET_SIZE() {
+        static const std::string set_size("%: set#\% contains \% element(s)\n");
+        return set_size;
+    }
+
+    std::string REMOVE() {
+        static const std::string remove("%: set #%, cypher % removed\n");
+    }
+}
+
 namespace {
   #ifdef NDEBUG
     constexpr bool debug = false;
@@ -15,32 +86,13 @@ namespace {
     using encstrset = std::unordered_set<std::string>;
     using set_map = std::unordered_map<unsigned long, encstrset>;
 
-    std::string NULL_STRING() {
-        static const std::string null_string("NULL");
-        return null_string;
-    }
-
-    std::string SET_CREATED() {
-        static const std::string set_created("%: set #\% created\n");
-        return set_created;
-    }
-
-    std::string CYPHER_WAS_PRESENT() {
-        static const std::string was_already_present("%: set #%, cypher \"%\" was_already_present\n");
-        return was_already_present;
-    }
-
-    std::string INVALID_VALUE() {
-        static const std::string invalid_value("%: invalid value (%)\n");
-        return invalid_value;
-    }
-
-    std::string SET_DOES_NOT_EXIST() {
-        static const std::string does_not_exist("%: set #% does not exist \n");
-        return does_not_exist;    
-    }
-
     unsigned long largest_id = 0;
+
+    // TODO zastanowić się czy to dobrze
+    set_map &m_set_map() {
+        static set_map *m_set_map_ptr = new set_map();
+        return *m_set_map_ptr;
+    }
 
     //TODO zastanowić się czy to dobrze
     std::ostream &get_cerr() {
@@ -71,6 +123,7 @@ namespace {
         return "\"" + std::string(p) + "\"";
     }
 
+    // Adds elements from src to dst.
     void add_all(const encstrset &src, encstrset &dst) {
         //TODO czy takie iterowanie jest dobre, czy powinno zależeć od debug
         for (auto str : src) {
@@ -79,11 +132,7 @@ namespace {
         }
     }
 
-    set_map &m_set_map() {
-        static set_map *m_set_map_ptr = new set_map();
-        return *m_set_map_ptr;
-    }
-
+    // Returns uppercase hex representation of a string
     std::string str_to_hex(const std::string& s) {
         std::ostringstream ret;
         for (const char& c : s)
