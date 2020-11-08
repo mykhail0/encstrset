@@ -17,7 +17,7 @@ namespace {
 using encstrset = std::unordered_set<std::string>;
 using set_map = std::unordered_map<unsigned long, encstrset>;
 
-static unsigned long largest_id;
+static unsigned long largest_id = 0;
 
 template<typename T>
 void tprintf(T format) {
@@ -69,9 +69,8 @@ set_map m_set_map = set_map();
 //TODO opakować m_set_map w funkcję (zmienna globalna, initialization order fiasco)
 //TODO iostream i zmienne globalne cerr i cout (peczar na labach mówił że też mogą być jakieś problemy
 
-// Increments pointer to C-string cyclically.
-// Highly unsafe, use at your own risk.
-size_t increment_Cstr_ptr(size_t ptr, const char *s) {
+// Increments pointer to C-string's contents cyclically.
+static size_t increment_Cstr_ptr(size_t ptr, const char *s) {
     ++ptr;
     if (s[ptr] == '\0')
         return 0;
@@ -81,11 +80,12 @@ size_t increment_Cstr_ptr(size_t ptr, const char *s) {
 /*
     Parametr value o wartości NULL jest niepoprawny. Z kolei wartość NULL parametru
     key lub pusty napis key oznaczają brak szyfrowania.
+
     Assumes C-strings are null-terminated.
-If the resulting string length would exceed the max_size, a length_error exception is thrown.
-A bad_alloc exception is thrown if the function fails when attempting to allocate storage.
+    If the resulting string length would exceed the max_size, a length_error exception is thrown.
+    A bad_alloc exception is thrown if the function fails when attempting to allocate storage.
 */
-std::string cypher(const char *key, const char *value) {
+static std::string cypher(const char *key, const char *value) {
     // Will remove possibly. If removed without being replaced with
     // an equivalent assertion will cause UB.
     if (value == nullptr)
@@ -98,6 +98,27 @@ std::string cypher(const char *key, const char *value) {
         ptr = increment_Cstr_ptr(ptr, key);
     }
     return ans;
+}
+
+unsigned long encstrset_new() {
+    unsigned long ans = largest_id;
+    ++largest_id;
+    m_set_map[ans] = encstrset();
+    return ans;
+}
+
+void encstrset_delete(unsigned long id) {
+    m_set_map.erase(id);
+    if (id != 0 && id == largest_id - 1)
+        --largest_id;
+}
+
+size_t encstrset_size(unsigned long id) {
+    auto it = m_set_map.find(id);
+    if (it == m_set_map.end())
+        return 0;
+
+    return it->second.size();
 }
 
 bool encstrset_insert(unsigned long id, const char *value, const char *key) {
@@ -159,7 +180,12 @@ static void add_all(const encstrset &src, encstrset &dst) {
             dst.insert(str);
     }
 }
-
+void encstrset_clear(unsigned long id) {
+    auto it = m_set_map.find(id);
+    if (it == m_set_map.end())
+        return;
+    it->second.clear();
+}
 void encstrset_copy(unsigned long src_id, unsigned long dst_id) {
     auto src_it = m_set_map.find(src_id);
     if (src_it == m_set_map.end())
