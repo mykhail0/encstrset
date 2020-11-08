@@ -15,14 +15,9 @@ namespace {
     using encstrset = std::unordered_set<std::string>;
     using set_map = std::unordered_map<unsigned long, encstrset>;
 
-    std::string NULL_STRING() {
-        static const std::string null_string("NULL");
-        return null_string;
-    }
-
-    std::string INSERTED() {
-        static const std::string inserted("inserted");
-        return inserted;
+    std::string SET_CREATED() {
+        static const std::string set_created("%: set #\% created\n");
+        return set_created;
     }
 
     std::string CYPHER_WAS_PRESENT() {
@@ -30,33 +25,14 @@ namespace {
         return was_already_present;
     }
 
-    std::string IS_PRESENT() {
-        static const std::string is_present("is present");
-        return is_present;
-    }
-
-    std::string IS_NOT_PRESENT() {
-        static const std::string is_present("is not present");
-        return is_present;
-    }
-
     std::string INVALID_VALUE() {
         static const std::string invalid_value("%: invalid value (%)\n");
         return invalid_value;
     }
 
-    std::string CYPHER() {
-        static const std::string cypher_str("cypher");
-        return cypher_str;
-    }
-
     std::string SET_DOES_NOT_EXIST() {
         static const std::string does_not_exist("%: set #% does not exist \n");
         return does_not_exist;    
-    }
-
-    std::string CREATED() {
-        static const std::string created("created");
     }
 
     unsigned long largest_id = 0;
