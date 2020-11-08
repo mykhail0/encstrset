@@ -1,13 +1,19 @@
 #include "encstrset.h"
-
 #include <unordered_set>
 #include <unordered_map>
 #include <iostream>
 #include <stdexcept>
 #include <cassert>
 
-static std::string NULL_STRING = "NULL";
 
+namespace {
+    std::string NULL_STRING = "NULL";
+    std::string INSERTED = "inserted";
+    std::string WAS_ALREADY_PRESENT = "was already present";
+    std::string IS_PRESENT = "is present";
+    std::string INVALID_VALUE = "invalid value";
+    std::string CYPHER = "cypher";
+}
 using encstrset = std::unordered_set<std::string>;
 using set_map = std::unordered_map<unsigned long, encstrset>;
 
@@ -31,7 +37,7 @@ void print_brackets(Targs... Fargs) {
     std::cout << ")";
 }
 
-template <typename ... Targs>
+template<typename ... Targs>
 std::string print_func_info(const std::string &func_name, Targs... Fargs) {
     std::cout << func_name << ": ";
     tprintf(Fargs...);
@@ -45,7 +51,7 @@ void print_func(const std::string &func_name, Targs... Fargs) {
     std::cout << std::endl;
 }
 
-std::string set_repr(unsigned long id) {
+std::string set_str(unsigned long id) {
     return "set #" + std::to_string(id);
 }
 
@@ -87,7 +93,7 @@ std::string cypher(const char *key, const char *value) {
 
     std::string ans(value);
     size_t ptr = 0;
-    for (char& c : ans) {
+    for (char &c : ans) {
         c = c ^ key[ptr];
         ptr = increment_Cstr_ptr(ptr, key);
     }
@@ -153,6 +159,7 @@ static void add_all(const encstrset &src, encstrset &dst) {
             dst.insert(str);
     }
 }
+
 void encstrset_copy(unsigned long src_id, unsigned long dst_id) {
     auto src_it = m_set_map.find(src_id);
     if (src_it == m_set_map.end())
