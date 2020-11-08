@@ -17,7 +17,7 @@ namespace formats {
     }
 
     std::string SET_CREATED() {
-        static const std::string set_created("%: set #% created\n");
+        static const std::string set_created("%: set #\% created\n");
         return set_created;
     }
 
@@ -36,19 +36,14 @@ namespace formats {
         return was_already_present;
     }
 
+    std::string COPIED_PRESENT() {
+        static const std::string copied_present("%: copied cypher % was already present in set #%\n");
+        return copied_present;
+    }
+
     std::string CYPHER_WAS_NOT_PRESENT() {
         static const std::string was_not_present("%: set #%, cypher \"%\" was not present in set #%\n");
         return was_not_present;
-    }
-
-    std::string IS_PRESENT() {
-        static const std::string is_present("is present");
-        return is_present;
-    }
-
-    std::string IS_NOT_PRESENT() {
-        static const std::string is_present("is not present");
-        return is_present;
     }
 
     std::string INVALID_VALUE() {
@@ -64,11 +59,6 @@ namespace formats {
     std::string SET_COPIED() {
         static const std::string set_copied("%: cypher \% copied from set #\% to set #%\n");
         return set_copied;
-    }
-
-    std::string COPIED_PRESENT() {
-        static const std::string copied_present("%: copied cypher % was already present in set #%\n");
-        return copied_present;
     }
 
     std::string SET_DELETED() {
