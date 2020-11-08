@@ -24,37 +24,44 @@ namespace {
         }
 
         std::string INSERTED() {
-            static const std::string inserted("%: set #%, cypher \"%\" inserted\n");
+            static const std::string inserted(
+                "%: set #%, cypher \"%\" inserted\n");
             return inserted;
         }
 
         std::string CREATED() {
-            static const std::string created("%: set #% created\n");
+            static const std::string created(
+                "%: set #% created\n");
             return created;
         }
 
         std::string IS_PRESENT() {
-            static const std::string is_present("%: set #%, cypher \"%\" is present\n");
+            static const std::string is_present(
+                "%: set #%, cypher \"%\" is present\n");
             return is_present;
         }
 
         std::string IS_NOT_PRESENT() {
-            static const std::string is_not_present("%: set #%, cypher \"%\" is not present\n");
+            static const std::string is_not_present(
+                "%: set #%, cypher \"%\" is not present\n");
             return is_not_present;
         }
 
         std::string WAS_PRESENT() {
-            static const std::string was_present("%: set #%, cypher \"%\" was already present\n");
+            static const std::string was_present(
+                "%: set #%, cypher \"%\" was already present\n");
             return was_present;
         }
 
         std::string WAS_NOT_PRESENT() {
-            static const std::string was_not_present("%: set #%, cypher \"%\" was not present\n");
+            static const std::string was_not_present(
+                "%: set #%, cypher \"%\" was not present\n");
             return was_not_present;
         }
 
         std::string COPIED_PRESENT() {
-            static const std::string copied_present("%: copied cypher \"%\" was already present in set #%\n");
+            static const std::string copied_present(
+                "%: copied cypher \"%\" was already present in set #%\n");
             return copied_present;
         }
 
@@ -64,12 +71,14 @@ namespace {
         }
 
         std::string DOES_NOT_EXIST() {
-            static const std::string does_not_exist("%: set #% does not exist\n");
+            static const std::string does_not_exist(
+                "%: set #% does not exist\n");
             return does_not_exist;
         }
 
         std::string COPIED() {
-            static const std::string copied("%: cypher \"%\" copied from set #% to set #%\n");
+            static const std::string copied(
+                "%: cypher \"%\" copied from set #% to set #%\n");
             return copied;
         }
 
@@ -84,7 +93,8 @@ namespace {
         }
 
         std::string REMOVED() {
-            static const std::string removed("%: set #%, cypher \"%\" removed\n");
+            static const std::string removed(
+                "%: set #%, cypher \"%\" removed\n");
             return removed;
         }
     }
