@@ -228,7 +228,7 @@ bool jnp1::encstrset_insert(unsigned long id,
 
     auto it = m_set_map().find(id);
     if (it == m_set_map().end()) {
-        tprintf(formats::SET_DOES_NOT_EXIST(), __func__, id);
+        tprintf(formats::DOES_NOT_EXIST(), __func__, id);
         return false;
     }
 
@@ -236,27 +236,20 @@ bool jnp1::encstrset_insert(unsigned long id,
     std::string cyphered_val = cypher(key, value);
 
     if (m_set.find(cyphered_val) != m_set.end()) {
-        tprintf(formats::CYPHER_WAS_PRESENT(),
-                __func__, id, str_to_hex(cyphered_val));
+        tprintf(formats::WAS_PRESENT(), __func__, id, str_to_hex(cyphered_val));
         return false;
     }
 
     m_set.insert(cyphered_val);
 
-    tprintf(formats::INSERTED(),
-            __func__,
-            id,
-            str_to_hex(cyphered_val));
+    tprintf(formats::INSERTED(), __func__, id, str_to_hex(cyphered_val));
 
     return true;
 }
 
-bool jnp1::encstrset_remove(unsigned long id, const char *value, const char *key) {
-    tprintf("%(%, %, %)\n",
-            __func__,
-            id,
-            param_str(value),
-            param_str(key));
+bool jnp1::encstrset_remove(unsigned long id,
+                            const char *value, const char *key) {
+    tprintf("%(%, %, %)\n", __func__, id, param_str(value), param_str(key));
 
     if (value == nullptr) {
         tprintf(formats::INVALID_VALUE(), __func__, param_str(value));
@@ -265,7 +258,7 @@ bool jnp1::encstrset_remove(unsigned long id, const char *value, const char *key
 
     auto it = m_set_map().find(id);
     if (it == m_set_map().end()) {
-        tprintf(formats::SET_DOES_NOT_EXIST(), __func__, id);
+        tprintf(formats::DOES_NOT_EXIST(), __func__, id);
         return false;
     }
 
@@ -275,26 +268,21 @@ bool jnp1::encstrset_remove(unsigned long id, const char *value, const char *key
 
     auto set_it = m_set.find(cyphered_val);
     if (set_it == m_set.end()) {
-        tprintf(formats::CYPHER_WAS_NOT_PRESENT(), __func__, value, str_to_hex(cyphered_val));
+        tprintf(formats::WAS_NOT_PRESENT(),
+                __func__, value, str_to_hex(cyphered_val));
         return false;
     }
 
     m_set.erase(set_it);
 
-    tprintf(formats::REMOVE(),
-            __func__,
-            id,
-            str_to_hex(cyphered_val));
+    tprintf(formats::REMOVED(), __func__, id, str_to_hex(cyphered_val));
 
     return true;
 }
 
-bool jnp1::encstrset_test(unsigned long id, const char *value, const char *key) {
-    tprintf("%(%, %, %)\n",
-            __func__,
-            id,
-            param_str(value),
-            param_str(key));
+bool jnp1::encstrset_test(unsigned long id,
+                          const char *value, const char *key) {
+    tprintf("%(%, %, %)\n", __func__, id, param_str(value), param_str(key));
 
     if (value == nullptr) {
         tprintf(formats::INVALID_VALUE(), __func__, param_str(value));
@@ -303,7 +291,7 @@ bool jnp1::encstrset_test(unsigned long id, const char *value, const char *key) 
 
     auto it = m_set_map().find(id);
     if (it == m_set_map().end()) {
-        tprintf(formats::SET_DOES_NOT_EXIST(), __func__, id);
+        tprintf(formats::DOES_NOT_EXIST(), __func__, id);
         return false;
     }
 
@@ -311,17 +299,12 @@ bool jnp1::encstrset_test(unsigned long id, const char *value, const char *key) 
 
     const encstrset &m_set = it->second;
     if (m_set.find(cyphered_val) == m_set.end()) {
-        tprintf(formats::CYPHER_IS_NOT_PRESENT(),
-                __func__,
-                id,
-                str_to_hex(cyphered_val));
+        tprintf(formats::IS_NOT_PRESENT(),
+                __func__, id, str_to_hex(cyphered_val));
         return false;
     }
 
-    tprintf(formats::CYPHER_IS_PRESENT(),
-            __func__,
-            id,
-            str_to_hex(cyphered_val));
+    tprintf(formats::IS_PRESENT(), __func__, id, str_to_hex(cyphered_val));
     return true;
 }
 
@@ -333,19 +316,16 @@ void jnp1::encstrset_clear(unsigned long id) {
 }
 
 void jnp1::encstrset_copy(unsigned long src_id, unsigned long dst_id) {
-    tprintf("%(%, %)\n",
-            __func__,
-            src_id,
-            dst_id);
+    tprintf("%(%, %)\n", __func__, src_id, dst_id);
 
     auto src_it = m_set_map().find(src_id);
     if (src_it == m_set_map().end()) {
-        tprintf(formats::SET_DOES_NOT_EXIST(), __func__, src_id);
+        tprintf(formats::DOES_NOT_EXIST(), __func__, src_id);
         return;
     }
     auto dst_it = m_set_map().find(dst_id);
     if (dst_it == m_set_map().end()) {
-        tprintf(formats::SET_DOES_NOT_EXIST(), __func__, dst_id);
+        tprintf(formats::DOES_NOT_EXIST(), __func__, dst_id);
         return;
     }
 
