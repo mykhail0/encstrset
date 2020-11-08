@@ -3,6 +3,7 @@
 #include <unordered_map>
 #include <stdexcept>
 #include <iostream>
+#include <iomanip>
 
 namespace {
     #ifdef NDEBUG
@@ -109,6 +110,14 @@ namespace {
     set_map &m_set_map() {
         static set_map *m_set_map_ptr = new set_map();
         return *m_set_map_ptr;
+    }
+
+    std::string str_to_hex(const std::string& s) {
+        std::ostringstream s;
+        for (char& c : foo)
+            // https://stackoverflow.com/a/3381629
+            s << std::hex << std::setfill('0') << std::setw(2) << std::uppercase << (int) c;
+        return s.str();
     }
 
     // Increments pointer to C-string's contents cyclically.
