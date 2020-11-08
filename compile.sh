@@ -1,4 +1,4 @@
-mkdir build
+mkdir -p build
 
 g++ -Wall -Wextra -O2 -std=c++17 -c src/encstrset.cc -o encstrset.o
 gcc -Wall -Wextra -O2 -std=c11 -c specyfikacja/encstrset_test1.c -o encstrset_test1.o

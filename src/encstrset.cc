@@ -26,43 +26,43 @@ namespace {
 
         std::string INSERTED() {
             static const std::string inserted(
-                "%: set #%, cypher \"%\" inserted\n");
+                    "%: set #%, cypher \"%\" inserted\n");
             return inserted;
         }
 
         std::string CREATED() {
             static const std::string created(
-                "%: set #% created\n");
+                    "%: set #% created\n");
             return created;
         }
 
         std::string IS_PRESENT() {
             static const std::string is_present(
-                "%: set #%, cypher \"%\" is present\n");
+                    "%: set #%, cypher \"%\" is present\n");
             return is_present;
         }
 
         std::string IS_NOT_PRESENT() {
             static const std::string is_not_present(
-                "%: set #%, cypher \"%\" is not present\n");
+                    "%: set #%, cypher \"%\" is not present\n");
             return is_not_present;
         }
 
         std::string WAS_PRESENT() {
             static const std::string was_present(
-                "%: set #%, cypher \"%\" was already present\n");
+                    "%: set #%, cypher \"%\" was already present\n");
             return was_present;
         }
 
         std::string WAS_NOT_PRESENT() {
             static const std::string was_not_present(
-                "%: set #%, cypher \"%\" was not present\n");
+                    "%: set #%, cypher \"%\" was not present\n");
             return was_not_present;
         }
 
         std::string COPIED_PRESENT() {
             static const std::string copied_present(
-                "%: copied cypher \"%\" was already present in set #%\n");
+                    "%: copied cypher \"%\" was already present in set #%\n");
             return copied_present;
         }
 
@@ -73,29 +73,29 @@ namespace {
 
         std::string DOES_NOT_EXIST() {
             static const std::string does_not_exist(
-                "%: set #% does not exist\n");
+                    "%: set #% does not exist\n");
             return does_not_exist;
         }
 
         std::string COPIED() {
             static const std::string copied(
-                "%: cypher \"%\" copied from set #% to set #%\n");
+                    "%: cypher \"%\" copied from set #% to set #%\n");
             return copied;
         }
 
         std::string DELETED() {
-            static const std::string deleted("%: set#% deleted\n");
+            static const std::string deleted("%: set #% deleted\n");
             return deleted;
         }
 
         std::string SIZE() {
-            static const std::string size("%: set#% contains % element(s)\n");
+            static const std::string size("%: set #% contains % element(s)\n");
             return size;
         }
 
         std::string REMOVED() {
             static const std::string removed(
-                "%: set #%, cypher \"%\" removed\n");
+                    "%: set #%, cypher \"%\" removed\n");
             return removed;
         }
 
@@ -146,7 +146,6 @@ namespace {
             if (*it == '%') {
                 get_cerr() << value;
                 //TODO Czy taki sposób iterowania po stringu jest dobry
-                // recursive cal
                 tprintf(&(format[it - format.begin() + 1]), Fargs...);
                 return;
             }
@@ -163,15 +162,15 @@ namespace {
     // Adds elements from src to dst.
     void add_all(const encstrset &src, encstrset &dst,
                  unsigned long src_id, unsigned long dst_id) {
+        static const std::string copy_func_name = "encstrset_copy";
         //TODO czy takie iterowanie jest dobre, czy powinno zależeć od debug
         for (auto str : src) {
             if (dst.find(str) == dst.end()) {
                 dst.insert(str);
-                tprintf(formats::COPIED(),
-                        __func__, str_to_hex(str), src_id, dst_id);
+                tprintf(formats::COPIED(), copy_func_name, str_to_hex(str), src_id, dst_id);
             } else {
                 tprintf(formats::COPIED_PRESENT(),
-                        __func__, str_to_hex(str), dst_id);
+                        copy_func_name, str_to_hex(str), dst_id);
             }
 
         }
@@ -236,6 +235,7 @@ void jnp1::encstrset_delete(unsigned long id) {
 }
 
 size_t jnp1::encstrset_size(unsigned long id) {
+    tprintf("%(%)\n", __func__, id);
     auto it = m_set_map().find(id);
     if (it == m_set_map().end()) {
         tprintf(formats::DOES_NOT_EXIST(), __func__, id);
@@ -299,7 +299,7 @@ bool jnp1::encstrset_remove(unsigned long id,
     auto set_it = m_set.find(cyphered_val);
     if (set_it == m_set.end()) {
         tprintf(formats::WAS_NOT_PRESENT(),
-                __func__, value, str_to_hex(cyphered_val));
+                __func__, id, str_to_hex(cyphered_val));
         return false;
     }
 
@@ -339,6 +339,7 @@ bool jnp1::encstrset_test(unsigned long id,
 }
 
 void jnp1::encstrset_clear(unsigned long id) {
+    tprintf("%(%)\n", __func__, id);
     auto it = m_set_map().find(id);
     if (it == m_set_map().end()) {
         tprintf(formats::DOES_NOT_EXIST(), __func__, id);
