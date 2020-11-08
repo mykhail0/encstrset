@@ -98,13 +98,13 @@ namespace {
         return ret.str();
     }
 
-    // TODO zastanowić się czy to dobrze
+    // TODO Czy pamięć może być niezwalniana
     set_map &m_set_map() {
         static set_map *m_set_map_ptr = new set_map();
         return *m_set_map_ptr;
     }
 
-    //TODO zastanowić się czy to dobrze
+    //TODO Czy taki sposób inicjalizowania get_cerr jest dobry
     std::ostream &get_cerr() {
         static std::ios_base::Init init;
         return std::cerr;
@@ -123,7 +123,7 @@ namespace {
         for (auto it = format.cbegin(); it < format.cend(); it++) {
             if (*it == '%') {
                 get_cerr() << value;
-                //TODO spytać się o to
+                //TODO Czy taki sposób iterowania po stringu jest dobry
                 tprintf(&(format[it - format.begin() + 1]), Fargs...); // recursive cal
                 return;
             }
@@ -141,7 +141,6 @@ namespace {
     void add_all(const encstrset &src, encstrset &dst, unsigned long src_id, unsigned long dst_id) {
         //TODO czy takie iterowanie jest dobre, czy powinno zależeć od debug
         for (auto str : src) {
-
             if (dst.find(str) == dst.end()) {
                 dst.insert(str);
                 tprintf(formats::CYPHER_COPIED(),
@@ -184,29 +183,26 @@ namespace {
         std::string ans(value);
         size_t ptr = 0;
         for (char &c : ans) {
+            //TODO Clang wywala warning, o co chodzi?
             c = c ^ key[ptr];
             ptr = increment_Cstr_ptr(ptr, key);
         }
         return ans;
     }
-
 }
 
 unsigned long jnp1::encstrset_new() {
-    if (debug)
-        tprintf("%()\n", __func__);
+    tprintf("%()\n", __func__);
     unsigned long ans = largest_id;
     ++largest_id;
     m_set_map()[ans] = encstrset();
 
-    if (debug)
-        tprintf("%: set #%\n", __func__, ans);
+    tprintf("%: set #%\n", __func__, ans);
     return ans;
 }
 
 void jnp1::encstrset_delete(unsigned long id) {
-    if (debug)
-        tprintf("%(%)\n", __func__, id);
+    tprintf("%(%)\n", __func__, id);
     m_set_map().erase(id);
     if (id != 0 && id == largest_id - 1)
         --largest_id;
