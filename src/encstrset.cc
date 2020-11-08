@@ -97,6 +97,11 @@ namespace {
                 "%: set #%, cypher \"%\" removed\n");
             return removed;
         }
+
+        std::string CLEAR() {
+            static const std::string cleared("%: set #% cleared\n");
+            return cleared;
+        }
     }
 
     // Returns uppercase hex representation of a string
@@ -221,18 +226,18 @@ void jnp1::encstrset_delete(unsigned long id) {
         --largest_id;
 
     if (prev_size != m_set_map().size())
-        tprintf(DELETED(), __func__, id);
+        tprintf(formats::DELETED(), __func__, id);
 }
 
 size_t jnp1::encstrset_size(unsigned long id) {
     auto it = m_set_map().find(id);
     if (it == m_set_map().end()) {
-        tprintf(DOES_NOT_EXIST(), __func__, id);
+        tprintf(formats::DOES_NOT_EXIST(), __func__, id);
         return 0;
     }
 
     auto ans = it->second.size();
-    tprintf(SIZE(), __func__, id, ans);
+    tprintf(formats::SIZE(), __func__, id, ans);
     return ans;
 }
 
@@ -329,9 +334,12 @@ bool jnp1::encstrset_test(unsigned long id,
 
 void jnp1::encstrset_clear(unsigned long id) {
     auto it = m_set_map().find(id);
-    if (it == m_set_map().end())
+    if (it == m_set_map().end()) {
+        tprintf(formats::DOES_NOT_EXIST(), __func__, id);
         return;
+    }
     it->second.clear();
+    tprintf(formats::CLEAR(), __func__, id);
 }
 
 void jnp1::encstrset_copy(unsigned long src_id, unsigned long dst_id) {
