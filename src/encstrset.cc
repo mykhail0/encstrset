@@ -4,17 +4,52 @@
 #include <stdexcept>
 #include <iostream>
 
+//TODO wyświetlanie w zależności od debug (poczytać o paczkach c++)
+
 namespace {
+    #ifdef NDEBUG
+        constexpr bool debug = false;
+    #else
+        constexpr bool debug = true;
+    #endif
+
     using encstrset = std::unordered_set<std::string>;
     using set_map = std::unordered_map<unsigned long, encstrset>;
 
-    std::string NULL_STRING = "NULL";
-    std::string INSERTED = "inserted";
-    std::string WAS_ALREADY_PRESENT = "was already present";
-    std::string IS_PRESENT = "is present";
-    std::string INVALID_VALUE = "invalid value";
-    std::string CYPHER = "cypher";
-    std::string DOES_NOT_EXIST = "does not exist";
+    std::string NULL_STRING() {
+        static const std::string null_string("NULL");
+        return null_string;
+    }
+
+    std::string INSERTED() {
+        static const std::string inserted("inserted");
+        return inserted;
+    }
+
+    std::string WAS_ALREADY_PRESENT() {
+        static const std::string was_already_present("was alredy present");
+        return was_already_present;
+    }
+
+    std::string IS_PRESENT() {
+        static const std::string is_present("is present");
+        return is_present;
+    }
+
+    std::string INVALID_VALUE() {
+        static const std::string invalid_value("invalid value");
+        return invalid_value;
+    }
+
+    std::string CYPHER() {
+        static const std::string cypher_str("cypher");
+        return cypher_str;
+    }
+
+    std::string DOES_NOT_EXIST () {
+        static const std::string does_not_exist("does not exist");
+        return does_not_exist;
+    }
 
     unsigned long largest_id = 0;
 
@@ -46,7 +81,6 @@ namespace {
 
     template<typename ... Targs>
     void print_func_info(const std::string &func_name, Targs... Fargs) {
-    //std::string print_func_info(const std::string &func_name, Targs... Fargs) {
         std::cout << func_name << ": ";
         tprintf(Fargs...);
         std::cout << std::endl;
@@ -65,11 +99,10 @@ namespace {
 
     std::string param_str(const char *p) {
         if (p == nullptr)
-            return NULL_STRING;
+            return NULL_STRING();
         return "\"" + std::string(p) + "\"";
     }
 
-    //static void add_all(const encstrset &src, encstrset &dst) {
     void add_all(const encstrset &src, encstrset &dst) {
         //TODO czy takie iterowanie jest dobre, czy powinno zależeć od debug
         for (auto str : src) {
@@ -105,14 +138,17 @@ namespace {
         }
         return ans;
     }
+
+    std::ostream &get_cerr() {
+        static std::ios_base::Init init;
+        return std::cerr;
+    }
+
+    std::ostream &get_cout() {
+        static std::ios_base::Init init;
+        return std::cout;
+    }
 }
-
-//TODO namespace jnp1 przy kompilacji w c++
-
-//TODO iostream i zmienne globalne cerr i cout (peczar na labach mówił że też mogą być jakieś problemy
-
-//TODO wyświetlanie w zależności od debug (poczytać o paczkach c++)
-//TODO opakować m_set_map w funkcję (zmienna globalna, initialization order fiasco)
 
 unsigned long jnp1::encstrset_new() {
     unsigned long ans = largest_id;

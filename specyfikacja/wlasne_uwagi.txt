@@ -1,3 +1,3 @@
-1) Const w arg-ach i w zwracanych typach.
+1) Constexpr i const w zwracanych typach funkcji.
 2) Co z C-stringami, które nie są null-terminated.
 Wyjątki w cypher()?
