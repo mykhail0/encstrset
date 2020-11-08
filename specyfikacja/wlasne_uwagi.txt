@@ -8,3 +8,4 @@
 8) czy będziemy karani za niezwolnioną pamięć przy zmiennych globalnych
 9) czy debug może być w funkcji wyświetlającej
 10) iterowanie po stringu, patrz: tprintf
+11) czy trzeba robić str_to_hex() ładniej i bez zbędnej pamięci

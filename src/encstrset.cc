@@ -1,3 +1,4 @@
+// TODO string& s vs string &s
 #include "encstrset.h"
 #include <unordered_set>
 #include <unordered_map>
@@ -106,12 +107,17 @@ namespace {
 
     // Returns uppercase hex representation of a string
     std::string str_to_hex(const std::string &s) {
+        // TODO Jeśli zaszyfrowane to co robić?
+        if (s.empty())
+            return s;
+
         std::ostringstream ret;
         for (const char &c : s)
             // https://stackoverflow.com/a/3381629
             ret << std::hex << std::setfill('0')
-                << std::setw(2) << std::uppercase << (int) c;
-        return ret.str();
+                << std::setw(2) << std::uppercase << (int) c << " ";
+        std::string str = ret.str();
+        return str.erase(str.size() - 1);
     }
 
     // TODO Czy pamięć może być niezwalniana
