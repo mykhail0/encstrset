@@ -15,6 +15,11 @@ namespace {
     using encstrset = std::unordered_set<std::string>;
     using set_map = std::unordered_map<unsigned long, encstrset>;
 
+    std::string NULL_STRING() {
+        static const std::string null_string("NULL");
+        return null_string;
+    }
+
     std::string SET_CREATED() {
         static const std::string set_created("%: set #\% created\n");
         return set_created;
@@ -81,7 +86,7 @@ namespace {
 
     std::string str_to_hex(const std::string& s) {
         std::ostringstream ret;
-        for (char& c : foo)
+        for (const char& c : s)
             // https://stackoverflow.com/a/3381629
             ret << std::hex << std::setfill('0') << std::setw(2) << std::uppercase << (int) c;
         return ret.str();
