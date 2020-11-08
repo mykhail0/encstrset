@@ -1,7 +1,15 @@
 #ifndef ENCSTRSET_H
 #define ENCSTRSET_H
 
-#include <cstdlib>
+#ifdef __cplusplus
+  #include <cstdlib>
+  namespace jnp1 {
+    extern "C" {
+#else
+  #include <stdbool.h>
+  #include <stdlib.h>
+#endif
+
 
 /*
       Tworzy nowy zbiór i zwraca jego identyfikator.
@@ -57,5 +65,10 @@ void encstrset_clear(unsigned long id);
     dst_id, a w przeciwnym przypadku nic nie robi.
 */
 void encstrset_copy(unsigned long src_id, unsigned long dst_id);
+
+#ifdef __cplusplus
+    }
+  }
+#endif
 
 #endif /* ENCSTRSET_H */

@@ -4,18 +4,6 @@
 #include <stdexcept>
 #include <iostream>
 
-/*
-#ifdef __cplusplus
-
-
-namespace jnp1 {
-    extern "C" {
-#else
-#include <stdbool.h>
-#include <stdio.h>
-#endif*/
-
-
 namespace {
     using encstrset = std::unordered_set<std::string>;
     using set_map = std::unordered_map<unsigned long, encstrset>;
@@ -57,7 +45,8 @@ namespace {
     }
 
     template<typename ... Targs>
-    std::string print_func_info(const std::string &func_name, Targs... Fargs) {
+    void print_func_info(const std::string &func_name, Targs... Fargs) {
+    //std::string print_func_info(const std::string &func_name, Targs... Fargs) {
         std::cout << func_name << ": ";
         tprintf(Fargs...);
         std::cout << std::endl;
@@ -80,7 +69,8 @@ namespace {
         return "\"" + std::string(p) + "\"";
     }
 
-    static void add_all(const encstrset &src, encstrset &dst) {
+    //static void add_all(const encstrset &src, encstrset &dst) {
+    void add_all(const encstrset &src, encstrset &dst) {
         //TODO czy takie iterowanie jest dobre, czy powinno zależeć od debug
         for (auto str : src) {
             if (dst.find(str) == dst.end())
@@ -92,6 +82,29 @@ namespace {
         static set_map *m_set_map_ptr = new set_map();
         return *m_set_map_ptr;
     }
+
+    /*
+        Parametr value o wartości NULL jest niepoprawny. Z kolei wartość NULL parametru
+        key lub pusty napis key oznaczają brak szyfrowania.
+
+        Assumes C-strings are null-terminated.
+        If the resulting string length would exceed the max_size, a length_error exception is thrown.
+        A bad_alloc exception is thrown if the function fails when attempting to allocate storage.
+    */
+    std::string cypher(const char *key, const char *value) {
+        // Will remove possibly. If removed without being replaced with
+        // an equivalent assertion will cause UB.
+        if (value == nullptr)
+            throw std::invalid_argument("value is null");
+
+        std::string ans(value);
+        size_t ptr = 0;
+        for (char &c : ans) {
+            c = c ^ key[ptr];
+            ptr = increment_Cstr_ptr(ptr, key);
+        }
+        return ans;
+    }
 }
 
 //TODO namespace jnp1 przy kompilacji w c++
@@ -101,44 +114,20 @@ namespace {
 //TODO wyświetlanie w zależności od debug (poczytać o paczkach c++)
 //TODO opakować m_set_map w funkcję (zmienna globalna, initialization order fiasco)
 
-
-/*
-    Parametr value o wartości NULL jest niepoprawny. Z kolei wartość NULL parametru
-    key lub pusty napis key oznaczają brak szyfrowania.
-
-    Assumes C-strings are null-terminated.
-    If the resulting string length would exceed the max_size, a length_error exception is thrown.
-    A bad_alloc exception is thrown if the function fails when attempting to allocate storage.
-*/
-static std::string cypher(const char *key, const char *value) {
-    // Will remove possibly. If removed without being replaced with
-    // an equivalent assertion will cause UB.
-    if (value == nullptr)
-        throw std::invalid_argument("value is null");
-
-    std::string ans(value);
-    size_t ptr = 0;
-    for (char &c : ans) {
-        c = c ^ key[ptr];
-        ptr = increment_Cstr_ptr(ptr, key);
-    }
-    return ans;
-}
-
-unsigned long encstrset_new() {
+unsigned long jnp1::encstrset_new() {
     unsigned long ans = largest_id;
     ++largest_id;
     m_set_map()[ans] = encstrset();
     return ans;
 }
 
-void encstrset_delete(unsigned long id) {
+void jnp1::encstrset_delete(unsigned long id) {
     m_set_map().erase(id);
     if (id != 0 && id == largest_id - 1)
         --largest_id;
 }
 
-size_t encstrset_size(unsigned long id) {
+size_t jnp1::encstrset_size(unsigned long id) {
     auto it = m_set_map().find(id);
     if (it == m_set_map().end())
         return 0;
@@ -146,7 +135,7 @@ size_t encstrset_size(unsigned long id) {
     return it->second.size();
 }
 
-bool encstrset_insert(unsigned long id, const char *value, const char *key) {
+bool jnp1::encstrset_insert(unsigned long id, const char *value, const char *key) {
     if (value == nullptr)
         return false;
 
@@ -164,7 +153,7 @@ bool encstrset_insert(unsigned long id, const char *value, const char *key) {
     return true;
 }
 
-bool encstrset_remove(unsigned long id, const char *value, const char *key) {
+bool jnp1::encstrset_remove(unsigned long id, const char *value, const char *key) {
     if (value == nullptr)
         return false;
 
@@ -184,7 +173,7 @@ bool encstrset_remove(unsigned long id, const char *value, const char *key) {
     return true;
 }
 
-bool encstrset_test(unsigned long id, const char *value, const char *key) {
+bool jnp1::encstrset_test(unsigned long id, const char *value, const char *key) {
     if (value == nullptr)
         return false;
 
@@ -198,14 +187,14 @@ bool encstrset_test(unsigned long id, const char *value, const char *key) {
     return m_set.find(cyphered_val) != m_set.end();
 }
 
-void encstrset_clear(unsigned long id) {
+void jnp1::encstrset_clear(unsigned long id) {
     auto it = m_set_map().find(id);
     if (it == m_set_map().end())
         return;
     it->second.clear();
 }
 
-void encstrset_copy(unsigned long src_id, unsigned long dst_id) {
+void jnp1::encstrset_copy(unsigned long src_id, unsigned long dst_id) {
     auto src_it = m_set_map().find(src_id);
     if (src_it == m_set_map().end())
         return;
@@ -215,9 +204,3 @@ void encstrset_copy(unsigned long src_id, unsigned long dst_id) {
 
     add_all(src_it->second, dst_it->second);
 }
-
-/*
-#ifdef __cplusplus
-}
-}
-#endif */
