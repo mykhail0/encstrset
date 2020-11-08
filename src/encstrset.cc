@@ -5,24 +5,30 @@
 #include <iostream>
 #include <iomanip>
 
-namespace {
-#ifdef NDEBUG
-    constexpr bool debug = false;
-#else
-    constexpr bool debug = true;
-#endif
-
-    using encstrset = std::unordered_set<std::string>;
-    using set_map = std::unordered_map<unsigned long, encstrset>;
-
+namespace formats {
     std::string NULL_STRING() {
         static const std::string null_string("NULL");
         return null_string;
     }
 
+    std::string INSERTED() {
+        static const std::string inserted("%: set #%, cypher \% inserted\n");
+        return inserted;
+    }
+
     std::string SET_CREATED() {
-        static const std::string set_created("%: set #% created\n");
+        static const std::string set_created("%: set #\% created\n");
         return set_created;
+    }
+
+    std::string CYPHER_IS_PRESENT() {
+        static const std::string is_present("%: set #%, cypher \"%\" is present\n");
+        return is_present;
+    }
+
+    std::string CYPHER_IS_NOT_PRESENT() {
+        static const std::string is_not_present("%: set #%, cypher \"%\" is not present\n");
+        return is_not_present;
     }
 
     std::string CYPHER_WAS_PRESENT() {
@@ -30,20 +36,14 @@ namespace {
         return was_already_present;
     }
 
+    std::string COPIED_PRESENT() {
+        static const std::string copied_present("%: copied cypher % was already present in set #%\n");
+        return copied_present;
+    }
+
     std::string CYPHER_WAS_NOT_PRESENT() {
-        static const std::string was_not_present("%: set #%, cypher \"%\" was not present\n");
+        static const std::string was_not_present("%: set #%, cypher \"%\" was not present in set #%\n");
         return was_not_present;
-    }
-
-
-    std::string IS_PRESENT() {
-        static const std::string is_present("is present");
-        return is_present;
-    }
-
-    std::string IS_NOT_PRESENT() {
-        static const std::string is_present("is not present");
-        return is_present;
     }
 
     std::string INVALID_VALUE() {
@@ -52,22 +52,49 @@ namespace {
     }
 
     std::string SET_DOES_NOT_EXIST() {
-        static const std::string does_not_exist("%: set #% does not exist \n");
-        return does_not_exist;
+        static const std::string does_not_exist("%: set #\% does not exist\n");
+        return does_not_exist;    
     }
 
+    std::string SET_COPIED() {
+        static const std::string set_copied("%: cypher \% copied from set #\% to set #%\n");
+        return set_copied;
+    }
+
+    std::string SET_DELETED() {
+        static const std::string set_deleted("%: set#\% deleted\n");
+        return set_deleted;
+    }
+
+    std::string SET_SIZE() {
+        static const std::string set_size("%: set#\% contains \% element(s)\n");
+        return set_size;
+    }
+
+    std::string REMOVE() {
+        static const std::string remove("%: set #%, cypher % removed\n");
+    }
+}
+
+namespace {
+  #ifdef NDEBUG
+    constexpr bool debug = false;
+  #else
+    constexpr bool debug = true;
+  #endif
+
+    using encstrset = std::unordered_set<std::string>;
+    using set_map = std::unordered_map<unsigned long, encstrset>;
 
     unsigned long largest_id = 0;
 
-    std::string str_to_hex(const std::string &s) {
-        std::ostringstream ret;
-        for (const char &c : s)
-            // https://stackoverflow.com/a/3381629
-            ret << std::hex << std::setfill('0') << std::setw(2) << std::uppercase << (int) c;
-        return ret.str();
+    // TODO zastanowić się czy to dobrze
+    set_map &m_set_map() {
+        static set_map *m_set_map_ptr = new set_map();
+        return *m_set_map_ptr;
     }
 
-//TODO zastanowić się czy to dobrze
+    //TODO zastanowić się czy to dobrze
     std::ostream &get_cerr() {
         static std::ios_base::Init init;
         return std::cerr;
@@ -100,6 +127,7 @@ namespace {
         return "\"" + std::string(p) + "\"";
     }
 
+    // Adds elements from src to dst.
     void add_all(const encstrset &src, encstrset &dst, unsigned long src_id, unsigned long dst_id) {
         //TODO czy takie iterowanie jest dobre, czy powinno zależeć od debug
         for (auto str : src) {
@@ -121,12 +149,16 @@ namespace {
         }
     }
 
-    set_map &m_set_map() {
-        static set_map *m_set_map_ptr = new set_map();
-        return *m_set_map_ptr;
+    // Returns uppercase hex representation of a string
+    std::string str_to_hex(const std::string& s) {
+        std::ostringstream ret;
+        for (const char& c : s)
+            // https://stackoverflow.com/a/3381629
+            ret << std::hex << std::setfill('0') << std::setw(2) << std::uppercase << (int) c;
+        return ret.str();
     }
 
-// Increments pointer to C-string's contents cyclically.
+    // Increments pointer to C-string's contents cyclically.
     size_t increment_Cstr_ptr(size_t ptr, const char *s) {
         ++ptr;
         if (s[ptr] == '\0')
@@ -134,14 +166,14 @@ namespace {
         return ptr;
     }
 
-/*
-    Parametr value o wartości NULL jest niepoprawny. Z kolei wartość NULL parametru
-    key lub pusty napis key oznaczają brak szyfrowania.
+    /*
+        Parametr value o wartości NULL jest niepoprawny. Z kolei wartość NULL parametru
+        key lub pusty napis key oznaczają brak szyfrowania.
 
-    Assumes C-strings are null-terminated.
-    If the resulting string length would exceed the max_size, a length_error exception is thrown.
-    A bad_alloc exception is thrown if the function fails when attempting to allocate storage.
-*/
+        Assumes C-strings are null-terminated.
+        If the resulting string length would exceed the max_size, a length_error exception is thrown.
+        A bad_alloc exception is thrown if the function fails when attempting to allocate storage.
+    */
     std::string cypher(const char *key, const char *value) {
         // Will remove possibly. If removed without being replaced with
         // an equivalent assertion will cause UB.
