@@ -4,8 +4,6 @@
 #include <stdexcept>
 #include <iostream>
 
-//TODO wyświetlanie w zależności od debug (poczytać o paczkach c++)
-
 namespace {
 #ifdef NDEBUG
     constexpr bool debug = false;
@@ -51,10 +49,10 @@ namespace {
         return cypher_str;
     }
 
-    std::string SET_DOES_NOT_EXIST() {
+std::string SET_DOES_NOT_EXIST() {
         static const std::string does_not_exist("%: set #% does not exist \n");
-        return does_not_exist;
-    }
+        return does_not_exist;    
+}
 
     std::string CREATED() {
         static const std::string created("created");
