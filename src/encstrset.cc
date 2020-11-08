@@ -104,11 +104,11 @@ namespace {
     }
 
     std::string str_to_hex(const std::string& s) {
-        std::ostringstream s;
+        std::ostringstream ret;
         for (char& c : foo)
             // https://stackoverflow.com/a/3381629
-            s << std::hex << std::setfill('0') << std::setw(2) << std::uppercase << (int) c;
-        return s.str();
+            ret << std::hex << std::setfill('0') << std::setw(2) << std::uppercase << (int) c;
+        return ret.str();
     }
 
     // Increments pointer to C-string's contents cyclically.
