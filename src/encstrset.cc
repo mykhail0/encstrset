@@ -6,11 +6,11 @@
 #include <iomanip>
 
 namespace {
-#ifdef NDEBUG
+  #ifdef NDEBUG
     constexpr bool debug = false;
-#else
+  #else
     constexpr bool debug = true;
-#endif
+  #endif
 
     using encstrset = std::unordered_set<std::string>;
     using set_map = std::unordered_map<unsigned long, encstrset>;
@@ -50,10 +50,10 @@ namespace {
         return cypher_str;
     }
 
-std::string SET_DOES_NOT_EXIST() {
+    std::string SET_DOES_NOT_EXIST() {
         static const std::string does_not_exist("%: set #% does not exist \n");
         return does_not_exist;    
-}
+    }
 
     std::string CREATED() {
         static const std::string created("created");
@@ -89,8 +89,6 @@ std::string SET_DOES_NOT_EXIST() {
             return NULL_STRING();
         return "\"" + std::string(p) + "\"";
     }
-
-    std::string str_to_hex(const std::string &s);
 
     void add_all(const encstrset &src, encstrset &dst) {
         //TODO czy takie iterowanie jest dobre, czy powinno zależeć od debug
