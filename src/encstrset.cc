@@ -110,7 +110,7 @@ namespace {
      */
     std::string param_str(const char *p) {
         if (p == nullptr)
-            return formats::NULL_STRING();
+            return NULL_STRING();
         return "\"" + std::string(p) + "\"";
     }
 
