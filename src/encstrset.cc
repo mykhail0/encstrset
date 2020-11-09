@@ -14,94 +14,52 @@ namespace {
     constexpr bool debug = true;
 #endif
 
+#define FUNC_WITH_NO_ARGS() do {\
+        std::cerr << __func__ << "()" << std::endl;\
+    } while (false)
+
+#define FUNC_WITH_ONE_ARG(arg) do {\
+        std::cerr << __func__ << "(" << arg << ")" << std::endl;\
+    } while (false)
+
+#define FUNC_WITH_TWO_ARGS(arg1, arg2) do {\
+        std::cerr << __func__ << "(" << arg1 << ", " << arg2 << ")" << std::endl;\
+    } while (false)
+
+#define FUNC_WITH_THREE_ARGS(arg1, arg2, arg3) do {\
+        std::cerr << __func__ << "(" << arg1 << ", " << arg2 << ", " << arg3 << ")" << std::endl;\
+    } while (false)
+
+#define STATE_OF_SET(set_id, state) do {\
+        std::cerr << __func__ << ": set #" << set_id << " " << state << std::endl;\
+    } while (false)
+
+#define STATE_OF_CYPHER(set_id, cypher, state) do {\
+        std::cerr << __func__ << ": set #" << set_id << ", cypher \"" << cypher << "\" "<< state << std::endl;\
+    } while (false)
+
+#define CYPHER_COPIED_PRESENT() do {\
+        std::cerr << __func__ << ": copied cypher \"" << cypher << "\" was already present in set #" << set_id << std::endl;\
+    } while (false)
+
+#define CYPHER_COPIED(cypher, set_src, set_dst) do {\
+        std::cerr << __func__ << ": cypher \"" << cypher << "\" copied from set #" << set_src << " to set #" << set_dst << std::endl;\
+    } while (false)
+
+#define INVALID_VALUE(value) do {\
+        std::cerr << __func__ << ": invalid value (" << value << ")" << std::endl;
+    } while (false)
+
+#define SIZE_OF_SET(set_id, elements) do {\
+        std::cerr << __func__ << ": set #" << set_id << " contains " << elements << " element(s)" << std::endl;\
+    } while (false)
+
     using encstrset = std::unordered_set<std::string>;
     using set_map = std::unordered_map<unsigned long, encstrset>;
 
-    namespace formats {
-        const std::string &NULL_STRING() {
-            static const std::string null_string("NULL");
-            return null_string;
-        }
-
-        const std::string &CYPHER_INSERTED() {
-            const static std::string inserted(
-                    "%: set #%, cypher \"%\" inserted\n");
-            return inserted;
-        }
-
-        const std::string &SET_CREATED() {
-            static const std::string created(
-                    "%: set #% created\n");
-            return created;
-        }
-
-        const std::string &CYPHER_IS_PRESENT() {
-            static const std::string is_present(
-                    "%: set #%, cypher \"%\" is present\n");
-            return is_present;
-        }
-
-        const std::string &CYPHER_IS_NOT_PRESENT() {
-            static const std::string is_not_present(
-                    "%: set #%, cypher \"%\" is not present\n");
-            return is_not_present;
-        }
-
-        const std::string &CYPHER_WAS_PRESENT() {
-            static const std::string was_present(
-                    "%: set #%, cypher \"%\" was already present\n");
-            return was_present;
-        }
-
-        const std::string &CYPHER_WAS_NOT_PRESENT() {
-            static const std::string was_not_present(
-                    "%: set #%, cypher \"%\" was not present\n");
-            return was_not_present;
-        }
-
-        const std::string &CYPHER_COPIED_PRESENT() {
-            static const std::string copied_present(
-                    "%: copied cypher \"%\" was already present in set #%\n");
-            return copied_present;
-        }
-
-        const std::string &INVALID_VALUE() {
-            static const std::string invalid_value("%: invalid value (%)\n");
-            return invalid_value;
-        }
-
-        const std::string &SET_DOES_NOT_EXIST() {
-            static const std::string does_not_exist(
-                    "%: set #% does not exist\n");
-            return does_not_exist;
-        }
-
-        const std::string &CYPHER_COPIED() {
-            static const std::string copied(
-                    "%: cypher \"%\" copied from set #% to set #%\n");
-            return copied;
-        }
-
-        const std::string &SET_DELETED() {
-            static const std::string deleted("%: set #% deleted\n");
-            return deleted;
-        }
-
-        const std::string &SIZE() {
-            static const std::string size("%: set #% contains % element(s)\n");
-            return size;
-        }
-
-        const std::string &CYPHER_REMOVED() {
-            static const std::string removed(
-                    "%: set #%, cypher \"%\" removed\n");
-            return removed;
-        }
-
-        const std::string &SET_CLEARED() {
-            static const std::string cleared("%: set #% cleared\n");
-            return cleared;
-        }
+    const std::string &NULL_STRING() {
+        static const std::string null_string("NULL");
+        return null_string;
     }
 
     // Returns uppercase hex representation of a string
@@ -122,38 +80,6 @@ namespace {
     set_map &m_set_map() {
         static set_map m_set_map_ptr;
         return m_set_map_ptr;
-    }
-
-    /*
-        Prints string 'format' on std::err.
-     */
-    void tprintf(const std::string &format) {
-        if (!debug)
-            return;
-        std::cerr << format;
-    }
-
-    /*
-        https://en.cppreference.com/w/cpp/language/parameter_pack
-        Function does anything only if 'debug' variable is equal to
-        'true'.
-        Parses 'format' string. For every character in the string,
-        if it is equal to '%' char prints 'value' parameter.
-        Otherwise, prints the character in format string.
-        Every character is printed using std::err.
-     */
-    template<typename T, typename... Targs>
-    void tprintf(const std::string &format, T value, Targs... Fargs) {
-        if (!debug)
-            return;
-        for (auto it = format.cbegin(); it < format.cend(); ++it) {
-            if (*it == '%') {
-                std::cerr << value;
-                tprintf(&(format[it - format.begin() + 1]), Fargs...);
-                return;
-            }
-            std::cerr << *it;
-        }
     }
 
     /*
