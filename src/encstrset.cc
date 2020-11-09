@@ -111,7 +111,6 @@ namespace {
 
     // Returns uppercase hex representation of a string
     std::string str_to_hex(const std::string &s) {
-        // TODO Jeśli puste to co robić?
         if (s.empty())
             return s;
 
