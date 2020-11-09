@@ -179,8 +179,7 @@ namespace {
         static const std::string copy_func_name = "encstrset_copy";
         //TODO czy takie iterowanie jest dobre, czy powinno zależeć od debug
         for (const auto &str : src) {
-            if (dst.find(str) == dst.end()) {
-                dst.insert(str);
+            if (dst.insert(str).second) {
                 tprintf(formats::CYPHER_COPIED(), copy_func_name, str_to_hex(str), src_id, dst_id);
             } else {
                 tprintf(formats::CYPHER_COPIED_PRESENT(),
@@ -242,12 +241,8 @@ unsigned long jnp1::encstrset_new() {
 
 void jnp1::encstrset_delete(unsigned long id) {
     tprintf("%(%)\n", __func__, id);
-    auto prev_size = m_set_map().size();
 
-    //TODO
-    m_set_map().erase(id);
-
-    if (prev_size != m_set_map().size())
+    if (m_set_map().erase(id)) // Map entry erased.
         tprintf(formats::SET_DELETED(), __func__, id);
     else tprintf(formats::SET_DOES_NOT_EXIST(), __func__, id);
 }
@@ -283,16 +278,11 @@ bool jnp1::encstrset_insert(unsigned long id,
     encstrset &m_set = it->second;
     std::string cyphered_val = cypher(key, value);
 
-    if (m_set.find(cyphered_val) != m_set.end()) {
+    if (!m_set.insert(cyphered_val).second) {
         tprintf(formats::CYPHER_WAS_PRESENT(), __func__, id, str_to_hex(cyphered_val));
         return false;
     }
-    
-    // TODO
-    m_set.insert(cyphered_val);
-
     tprintf(formats::CYPHER_INSERTED(), __func__, id, str_to_hex(cyphered_val));
-
     return true;
 }
 
@@ -312,21 +302,14 @@ bool jnp1::encstrset_remove(unsigned long id,
     }
 
     std::string cyphered_val = cypher(key, value);
-
     encstrset &m_set = it->second;
 
-    auto set_it = m_set.find(cyphered_val);
-    if (set_it == m_set.end()) {
+    if (!m_set.erase(cyphered_val)) { // There was not cyphered_val in set.
         tprintf(formats::CYPHER_WAS_NOT_PRESENT(),
                 __func__, id, str_to_hex(cyphered_val));
         return false;
     }
-
-    // TODO
-    m_set.erase(set_it);
-
     tprintf(formats::CYPHER_REMOVED(), __func__, id, str_to_hex(cyphered_val));
-
     return true;
 }
 
