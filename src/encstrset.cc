@@ -129,21 +129,13 @@ namespace {
         return m_set_map_ptr;
     }
 
-    //TODO Czy taki sposób inicjalizowania get_cerr jest dobry
-
-    // Stores and returns 'std::cerr' variable.
-    std::ostream &get_cerr() {
-        static std::ios_base::Init init;
-        return std::cerr;
-    }
-
     /*
         Prints string 'format' on std::err.
      */
     void tprintf(const std::string &format) {
         if (!debug)
             return;
-        get_cerr() << format;
+        std::cerr << format;
     }
 
     /*
@@ -161,12 +153,12 @@ namespace {
             return;
         for (auto it = format.cbegin(); it < format.cend(); it++) {
             if (*it == '%') {
-                get_cerr() << value;
+                std::cerr << value;
                 //TODO Czy taki sposób iterowania po stringu jest dobry
                 tprintf(&(format[it - format.begin() + 1]), Fargs...);
                 return;
             }
-            get_cerr() << *it;
+            std::cerr << *it;
         }
     }
 
