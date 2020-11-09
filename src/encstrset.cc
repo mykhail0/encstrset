@@ -17,9 +17,6 @@ namespace {
     using encstrset = std::unordered_set<std::string>;
     using set_map = std::unordered_map<unsigned long, encstrset>;
 
-    // Represents the largest id of all existing sets.
-    unsigned long largest_id = 0;
-
     namespace formats {
         const std::string &NULL_STRING() {
             static const std::string null_string("NULL");
@@ -136,7 +133,6 @@ namespace {
         std::cerr << format;
     }
 
-    // TODO objdump -d
     /*
         https://en.cppreference.com/w/cpp/language/parameter_pack
         Function does anything only if 'debug' variable is equal to
@@ -153,7 +149,6 @@ namespace {
         for (auto it = format.cbegin(); it < format.cend(); ++it) {
             if (*it == '%') {
                 std::cerr << value;
-                //TODO Czy taki sposób iterowania po stringu jest dobry
                 tprintf(&(format[it - format.begin() + 1]), Fargs...);
                 return;
             }
@@ -177,7 +172,6 @@ namespace {
     void add_all(const encstrset &src, encstrset &dst,
                  unsigned long src_id, unsigned long dst_id) {
         static const std::string copy_func_name = "encstrset_copy";
-        //TODO czy takie iterowanie jest dobre, czy powinno zależeć od debug
         for (const auto &str : src) {
             if (dst.insert(str).second) {
                 tprintf(formats::CYPHER_COPIED(), copy_func_name, str_to_hex(str), src_id, dst_id);
@@ -221,7 +215,6 @@ namespace {
 
         size_t ptr = 0;
         for (char &c : ans) {
-            //TODO Clang wywala warning, o co chodzi?
             c ^= key[ptr];
             ptr = increment_Cstr_ptr(ptr, key);
         }
@@ -230,9 +223,10 @@ namespace {
 }
 
 unsigned long jnp1::encstrset_new() {
+    static unsigned long largest_free_id = 0;
     tprintf("%()\n", __func__);
-    unsigned long ans = largest_id;
-    ++largest_id;
+    unsigned long ans = largest_free_id;
+    ++largest_free_id;
     m_set_map()[ans] = encstrset();
 
     tprintf(formats::SET_CREATED(), __func__, ans);
