@@ -111,7 +111,6 @@ namespace {
 
     // Returns uppercase hex representation of a string
     std::string str_to_hex(const std::string &s) {
-        // TODO Jeśli puste to co robić?
         if (s.empty())
             return s;
 
@@ -124,12 +123,10 @@ namespace {
         return str.erase(str.size() - 1);
     }
 
-    // TODO Czy pamięć może być niezwalniana
-
     // Global map that stores set's IDs as keys and sets as values.
     set_map &m_set_map() {
-        static set_map *m_set_map_ptr = new set_map();
-        return *m_set_map_ptr;
+        static set_map m_set_map_ptr;
+        return m_set_map_ptr;
     }
 
     //TODO Czy taki sposób inicjalizowania get_cerr jest dobry
