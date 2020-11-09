@@ -127,10 +127,11 @@ namespace {
                  unsigned long src_id, unsigned long dst_id) {
         static const std::string copy_func_name = "encstrset_copy";
         for (const auto &str : src) {
+            std::string hex_val = str_to_hex(str);
             if (dst.insert(str).second)
-                CYPHER_COPIED(copy_func_name, str_to_hex(str), src_id, dst_id);
+                CYPHER_COPIED(copy_func_name, hex_val, src_id, dst_id);
             else
-                CYPHER_COPIED_PRESENT(copy_func_name, str_to_hex(str), dst_id);
+                CYPHER_COPIED_PRESENT(copy_func_name, hex_val, dst_id);
         }
     }
 
@@ -224,12 +225,13 @@ bool jnp1::encstrset_insert(unsigned long id,
     encstrset &m_set = it->second;
     std::string cyphered_val = cypher(key, value);
 
+    std::string hex_val = str_to_hex(cyphered_val);
     if (!m_set.insert(cyphered_val).second) {
-        STATE_OF_CYPHER(id, str_to_hex(cyphered_val), "was already present");
+        STATE_OF_CYPHER(id, hex_val, "was already present");
         return false;
     }
 
-    STATE_OF_CYPHER(id, str_to_hex(cyphered_val), "inserted");
+    STATE_OF_CYPHER(id, hex_val, "inserted");
     return true;
 }
 
@@ -251,13 +253,13 @@ bool jnp1::encstrset_remove(unsigned long id,
     std::string cyphered_val = cypher(key, value);
     encstrset &m_set = it->second;
 
-    if (!m_set.erase(cyphered_val)) { // There was not cyphered_val in set.
-        STATE_OF_CYPHER(id, str_to_hex(cyphered_val), "was not present");
+    std::string hex_val = str_to_hex(cyphered_val);
+    if (!m_set.erase(cyphered_val)) { // There was no cyphered_val in the set.
+        STATE_OF_CYPHER(id, hex_val, "was not present");
         return false;
     }
 
-    // TODO znowu str_to_hex(cyphered_val)
-    STATE_OF_CYPHER(id, str_to_hex(cyphered_val), "removed");
+    STATE_OF_CYPHER(id, hex_val, "removed");
     return true;
 }
 
@@ -279,13 +281,13 @@ bool jnp1::encstrset_test(unsigned long id,
     std::string cyphered_val = cypher(key, value);
 
     const encstrset &m_set = it->second;
+    std::string hex_val = str_to_hex(cyphered_val);
     if (m_set.find(cyphered_val) == m_set.end()) {
-        STATE_OF_CYPHER(id, str_to_hex(cyphered_val), "is not present");
+        STATE_OF_CYPHER(id, hex_val, "is not present");
         return false;
     }
 
-    // TODO znowu str_to_hex(cyphered_val)
-    STATE_OF_CYPHER(id, str_to_hex(cyphered_val), "is present");
+    STATE_OF_CYPHER(id, hex_val, "is present");
     return true;
 }
 
