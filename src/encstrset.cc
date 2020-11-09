@@ -28,8 +28,8 @@ namespace {
             return null_string;
         }
 
-        std::string CYPHER_INSERTED() {
-            static const std::string inserted(
+        std::string& CYPHER_INSERTED() {
+            static std::string inserted(
                     "%: set #%, cypher \"%\" inserted\n");
             return inserted;
         }
