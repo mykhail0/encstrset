@@ -2,12 +2,15 @@
 #define ENCSTRSET_H
 
 #ifdef __cplusplus
-  #include <cstdlib>
+  #ifndef NDEBUG
+    #include <iostream>
+  #endif
+  #include <cstddef>
   namespace jnp1 {
     extern "C" {
 #else
   #include <stdbool.h>
-  #include <stdlib.h>
+  #include <stddef.h>
 #endif
 
 /*

@@ -1,4 +1,3 @@
-//TODO co z tym includem
 #include "encstrset.h"
 #include <unordered_set>
 #include <unordered_map>
@@ -6,7 +5,6 @@
 #include <iostream>
 #include <iomanip>
 
-//TODO I co z tym: w końcu z biblioteki przystosowany do c a nie do c++
 #include <cstring>
 
 namespace {
@@ -138,6 +136,7 @@ namespace {
         std::cerr << format;
     }
 
+    // TODO objdump -d
     /*
         https://en.cppreference.com/w/cpp/language/parameter_pack
         Function does anything only if 'debug' variable is equal to
@@ -151,7 +150,7 @@ namespace {
     void tprintf(const std::string &format, T value, Targs... Fargs) {
         if (!debug)
             return;
-        for (auto it = format.cbegin(); it < format.cend(); it++) {
+        for (auto it = format.cbegin(); it < format.cend(); ++it) {
             if (*it == '%') {
                 std::cerr << value;
                 //TODO Czy taki sposób iterowania po stringu jest dobry
@@ -179,7 +178,7 @@ namespace {
                  unsigned long src_id, unsigned long dst_id) {
         static const std::string copy_func_name = "encstrset_copy";
         //TODO czy takie iterowanie jest dobre, czy powinno zależeć od debug
-        for (auto str : src) {
+        for (const auto &str : src) {
             if (dst.find(str) == dst.end()) {
                 dst.insert(str);
                 tprintf(formats::CYPHER_COPIED(), copy_func_name, str_to_hex(str), src_id, dst_id);
@@ -218,13 +217,13 @@ namespace {
 
         std::string ans(value);
 
-        if (key == nullptr || strcmp(key, "") == 0)
+        if (key == nullptr || key[0] == '\0')
             return ans;
 
         size_t ptr = 0;
         for (char &c : ans) {
             //TODO Clang wywala warning, o co chodzi?
-            c = c ^ key[ptr];
+            c ^= key[ptr];
             ptr = increment_Cstr_ptr(ptr, key);
         }
         return ans;
@@ -245,9 +244,8 @@ void jnp1::encstrset_delete(unsigned long id) {
     tprintf("%(%)\n", __func__, id);
     auto prev_size = m_set_map().size();
 
+    //TODO
     m_set_map().erase(id);
-    if (id != 0 && id == largest_id - 1)
-        --largest_id;
 
     if (prev_size != m_set_map().size())
         tprintf(formats::SET_DELETED(), __func__, id);
@@ -289,7 +287,8 @@ bool jnp1::encstrset_insert(unsigned long id,
         tprintf(formats::CYPHER_WAS_PRESENT(), __func__, id, str_to_hex(cyphered_val));
         return false;
     }
-
+    
+    // TODO
     m_set.insert(cyphered_val);
 
     tprintf(formats::CYPHER_INSERTED(), __func__, id, str_to_hex(cyphered_val));
@@ -323,6 +322,7 @@ bool jnp1::encstrset_remove(unsigned long id,
         return false;
     }
 
+    // TODO
     m_set.erase(set_it);
 
     tprintf(formats::CYPHER_REMOVED(), __func__, id, str_to_hex(cyphered_val));
