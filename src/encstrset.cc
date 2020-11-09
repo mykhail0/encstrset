@@ -5,6 +5,7 @@
 #include <iostream>
 #include <iomanip>
 
+#include <cassert>
 #include <cstring>
 
 namespace {
@@ -14,24 +15,28 @@ namespace {
     constexpr bool debug = true;
 #endif
 
+// Prints function call for functions that recieve no arguments.
 #define FUNC_WITH_NO_ARGS() do {\
     if (debug) {\
       std::cerr << __func__ << "()" << std::endl;\
     }\
   } while (false)
 
+// Prints function call for functions that recieve one argument.
 #define FUNC_WITH_ONE_ARG(arg) do {\
     if (debug) {\
       std::cerr << __func__ << "(" << arg << ")" << std::endl;\
     }\
   } while (false)
 
+// Prints function call for functions that recieve two arguments.
 #define FUNC_WITH_TWO_ARGS(arg1, arg2) do {\
     if (debug) {\
       std::cerr << __func__ << "(" << arg1 << ", " << arg2 << ")" << std::endl;\
     }\
   } while (false)
 
+// Prints function call for functions that recieve three arguments.
 #define FUNC_WITH_THREE_ARGS(arg1, arg2, arg3) do {\
     if (debug) {\
       std::cerr << __func__ << "(" << arg1 << ", " << arg2 << ", " << arg3\
@@ -39,6 +44,7 @@ namespace {
     }\
   } while (false)
 
+// Prints the state of set_id sate. state describes the state to be printed.
 #define STATE_OF_SET(set_id, state) do {\
     if (debug) {\
       std::cerr << __func__ << ": set #" << set_id << " " << state\
@@ -46,6 +52,8 @@ namespace {
     }\
   } while (false)
 
+// Prints the state of cypher in set_id sate.
+// state describes the state to be printed.
 #define STATE_OF_CYPHER(set_id, cypher, state) do {\
     if (debug) {\
       std::cerr << __func__ << ": set #" << set_id << ", cypher \"" << cypher\
@@ -153,15 +161,12 @@ namespace {
         a length_error exception is thrown.
         A bad_alloc exception is thrown if the function fails
         when attempting to allocate storage.
-    */
+     */
     std::string cypher(const char *key, const char *value) {
-        // Will remove possibly. If removed without being replaced with
-        // an equivalent assertion will cause UB.
-        if (value == nullptr)
-            throw std::invalid_argument("value is null");
-
+        assert(value != nullptr);
         std::string ans(value);
 
+        // Lazy checking is key here.
         if (key == nullptr || key[0] == '\0')
             return ans;
 
