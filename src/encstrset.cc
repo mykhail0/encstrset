@@ -15,44 +15,64 @@ namespace {
 #endif
 
 #define FUNC_WITH_NO_ARGS() do {\
-        std::cerr << __func__ << "()" << std::endl;\
-    } while (false)
+    if (debug) {\
+      std::cerr << __func__ << "()" << std::endl;\
+    }\
+  } while (false)
 
 #define FUNC_WITH_ONE_ARG(arg) do {\
-        std::cerr << __func__ << "(" << arg << ")" << std::endl;\
-    } while (false)
+    if (debug) {\
+      std::cerr << __func__ << "(" << arg << ")" << std::endl;\
+    }\
+  } while (false)
 
 #define FUNC_WITH_TWO_ARGS(arg1, arg2) do {\
-        std::cerr << __func__ << "(" << arg1 << ", " << arg2 << ")" << std::endl;\
-    } while (false)
+    if (debug) {\
+      std::cerr << __func__ << "(" << arg1 << ", " << arg2 << ")" << std::endl;\
+    }\
+  } while (false)
 
 #define FUNC_WITH_THREE_ARGS(arg1, arg2, arg3) do {\
-        std::cerr << __func__ << "(" << arg1 << ", " << arg2 << ", " << arg3 << ")" << std::endl;\
-    } while (false)
+    if (debug) {\
+      std::cerr << __func__ << "(" << arg1 << ", " << arg2 << ", " << arg3 << ")" << std::endl;\
+    }\
+  } while (false)
 
 #define STATE_OF_SET(set_id, state) do {\
-        std::cerr << __func__ << ": set #" << set_id << " " << state << std::endl;\
-    } while (false)
+    if (debug) {\
+      std::cerr << __func__ << ": set #" << set_id << " " << state << std::endl;\
+    }\
+  } while (false)
 
 #define STATE_OF_CYPHER(set_id, cypher, state) do {\
-        std::cerr << __func__ << ": set #" << set_id << ", cypher \"" << cypher << "\" "<< state << std::endl;\
-    } while (false)
+    if (debug) {\
+      std::cerr << __func__ << ": set #" << set_id << ", cypher \"" << cypher << "\" "<< state << std::endl;\
+    }\
+  } while (false)
 
-#define CYPHER_COPIED_PRESENT() do {\
-        std::cerr << __func__ << ": copied cypher \"" << cypher << "\" was already present in set #" << set_id << std::endl;\
-    } while (false)
+#define CYPHER_COPIED_PRESENT(func_name, cypher, set_id) do {\
+    if (debug) {\
+      std::cerr << func_name << ": copied cypher \"" << cypher << "\" was already present in set #" << set_id << std::endl;\
+    }\
+  } while (false)
 
-#define CYPHER_COPIED(cypher, set_src, set_dst) do {\
-        std::cerr << __func__ << ": cypher \"" << cypher << "\" copied from set #" << set_src << " to set #" << set_dst << std::endl;\
-    } while (false)
+#define CYPHER_COPIED(func_name, cypher, set_src, set_dst) do {\
+    if (debug) {\
+      std::cerr << func_name << ": cypher \"" << cypher << "\" copied from set #" << set_src << " to set #" << set_dst << std::endl;\
+    }\
+  } while (false)
 
 #define INVALID_VALUE(value) do {\
-        std::cerr << __func__ << ": invalid value (" << value << ")" << std::endl;
-    } while (false)
+    if (debug) {\
+      std::cerr << __func__ << ": invalid value (" << value << ")" << std::endl;\
+    }\
+  } while (false)
 
 #define SIZE_OF_SET(set_id, elements) do {\
-        std::cerr << __func__ << ": set #" << set_id << " contains " << elements << " element(s)" << std::endl;\
-    } while (false)
+    if (debug) {\
+      std::cerr << __func__ << ": set #" << set_id << " contains " << elements << " element(s)" << std::endl;\
+    }\
+  } while (false)
 
     using encstrset = std::unordered_set<std::string>;
     using set_map = std::unordered_map<unsigned long, encstrset>;
@@ -99,13 +119,10 @@ namespace {
                  unsigned long src_id, unsigned long dst_id) {
         static const std::string copy_func_name = "encstrset_copy";
         for (const auto &str : src) {
-            if (dst.insert(str).second) {
-                tprintf(formats::CYPHER_COPIED(), copy_func_name, str_to_hex(str), src_id, dst_id);
-            } else {
-                tprintf(formats::CYPHER_COPIED_PRESENT(),
-                        copy_func_name, str_to_hex(str), dst_id);
-            }
-
+            if (dst.insert(str).second)
+                CYPHER_COPIED(copy_func_name, str_to_hex(str), src_id, dst_id);
+            else
+                CYPHER_COPIED_PRESENT(copy_func_name, str_to_hex(str), dst_id);
         }
     }
 
@@ -150,48 +167,49 @@ namespace {
 
 unsigned long jnp1::encstrset_new() {
     static unsigned long largest_free_id = 0;
-    tprintf("%()\n", __func__);
+    FUNC_WITH_NO_ARGS();
     unsigned long ans = largest_free_id;
     ++largest_free_id;
     m_set_map()[ans] = encstrset();
 
-    tprintf(formats::SET_CREATED(), __func__, ans);
+    STATE_OF_SET(ans, "created");
     return ans;
 }
 
 void jnp1::encstrset_delete(unsigned long id) {
-    tprintf("%(%)\n", __func__, id);
+    FUNC_WITH_ONE_ARG(id);
 
     if (m_set_map().erase(id)) // Map entry erased.
-        tprintf(formats::SET_DELETED(), __func__, id);
-    else tprintf(formats::SET_DOES_NOT_EXIST(), __func__, id);
+        STATE_OF_SET(id, "deleted");
+    else
+        STATE_OF_SET(id, "does not exist");
 }
 
 size_t jnp1::encstrset_size(unsigned long id) {
-    tprintf("%(%)\n", __func__, id);
+    FUNC_WITH_ONE_ARG(id);
     auto it = m_set_map().find(id);
     if (it == m_set_map().end()) {
-        tprintf(formats::SET_DOES_NOT_EXIST(), __func__, id);
+        STATE_OF_SET(id, "does not exist");
         return 0;
     }
 
     auto ans = it->second.size();
-    tprintf(formats::SIZE(), __func__, id, ans);
+    SIZE_OF_SET(id, ans);
     return ans;
 }
 
 bool jnp1::encstrset_insert(unsigned long id,
                             const char *value, const char *key) {
-    tprintf("%(%, %, %)\n", __func__, id, param_str(value), param_str(key));
+    FUNC_WITH_THREE_ARGS(id, param_str(value), param_str(key));
 
     if (value == nullptr) {
-        tprintf(formats::INVALID_VALUE(), __func__, param_str(value));
+        INVALID_VALUE(param_str(value));
         return false;
     }
 
     auto it = m_set_map().find(id);
     if (it == m_set_map().end()) {
-        tprintf(formats::SET_DOES_NOT_EXIST(), __func__, id);
+        STATE_OF_SET(id, "does not exist");
         return false;
     }
 
@@ -199,25 +217,26 @@ bool jnp1::encstrset_insert(unsigned long id,
     std::string cyphered_val = cypher(key, value);
 
     if (!m_set.insert(cyphered_val).second) {
-        tprintf(formats::CYPHER_WAS_PRESENT(), __func__, id, str_to_hex(cyphered_val));
+        STATE_OF_CYPHER(id, str_to_hex(cyphered_val), "was present");
         return false;
     }
-    tprintf(formats::CYPHER_INSERTED(), __func__, id, str_to_hex(cyphered_val));
+
+    STATE_OF_CYPHER(id, str_to_hex(cyphered_val), "inserted");
     return true;
 }
 
 bool jnp1::encstrset_remove(unsigned long id,
                             const char *value, const char *key) {
-    tprintf("%(%, %, %)\n", __func__, id, param_str(value), param_str(key));
+    FUNC_WITH_THREE_ARGS(id, param_str(value), param_str(key));
 
     if (value == nullptr) {
-        tprintf(formats::INVALID_VALUE(), __func__, param_str(value));
+        INVALID_VALUE(param_str(value));
         return false;
     }
 
     auto it = m_set_map().find(id);
     if (it == m_set_map().end()) {
-        tprintf(formats::SET_DOES_NOT_EXIST(), __func__, id);
+        STATE_OF_SET(id, "does not exist");
         return false;
     }
 
@@ -225,26 +244,27 @@ bool jnp1::encstrset_remove(unsigned long id,
     encstrset &m_set = it->second;
 
     if (!m_set.erase(cyphered_val)) { // There was not cyphered_val in set.
-        tprintf(formats::CYPHER_WAS_NOT_PRESENT(),
-                __func__, id, str_to_hex(cyphered_val));
+        STATE_OF_CYPHER(id, str_to_hex(cyphered_val), "was not present");
         return false;
     }
-    tprintf(formats::CYPHER_REMOVED(), __func__, id, str_to_hex(cyphered_val));
+
+    // TODO znowu str_to_hex(cyphered_val)
+    STATE_OF_CYPHER(id, str_to_hex(cyphered_val), "removed");
     return true;
 }
 
 bool jnp1::encstrset_test(unsigned long id,
                           const char *value, const char *key) {
-    tprintf("%(%, %, %)\n", __func__, id, param_str(value), param_str(key));
+    FUNC_WITH_THREE_ARGS(id, param_str(value), param_str(key));
 
     if (value == nullptr) {
-        tprintf(formats::INVALID_VALUE(), __func__, param_str(value));
+        INVALID_VALUE(param_str(value));
         return false;
     }
 
     auto it = m_set_map().find(id);
     if (it == m_set_map().end()) {
-        tprintf(formats::SET_DOES_NOT_EXIST(), __func__, id);
+        STATE_OF_SET(id, "does not exist");
         return false;
     }
 
@@ -252,37 +272,37 @@ bool jnp1::encstrset_test(unsigned long id,
 
     const encstrset &m_set = it->second;
     if (m_set.find(cyphered_val) == m_set.end()) {
-        tprintf(formats::CYPHER_IS_NOT_PRESENT(),
-                __func__, id, str_to_hex(cyphered_val));
+        STATE_OF_CYPHER(id, str_to_hex(cyphered_val), "is not present");
         return false;
     }
 
-    tprintf(formats::CYPHER_IS_PRESENT(), __func__, id, str_to_hex(cyphered_val));
+    // TODO znowu str_to_hex(cyphered_val)
+    STATE_OF_CYPHER(id, str_to_hex(cyphered_val), "is present");
     return true;
 }
 
 void jnp1::encstrset_clear(unsigned long id) {
-    tprintf("%(%)\n", __func__, id);
+    FUNC_WITH_ONE_ARG(id);
     auto it = m_set_map().find(id);
     if (it == m_set_map().end()) {
-        tprintf(formats::SET_DOES_NOT_EXIST(), __func__, id);
+        STATE_OF_SET(id, "does not exist");
         return;
     }
     it->second.clear();
-    tprintf(formats::SET_CLEARED(), __func__, id);
+    STATE_OF_SET(id, "cleared");
 }
 
 void jnp1::encstrset_copy(unsigned long src_id, unsigned long dst_id) {
-    tprintf("%(%, %)\n", __func__, src_id, dst_id);
+    FUNC_WITH_TWO_ARGS(src_id, dst_id);
 
     auto src_it = m_set_map().find(src_id);
     if (src_it == m_set_map().end()) {
-        tprintf(formats::SET_DOES_NOT_EXIST(), __func__, src_id);
+        STATE_OF_SET(src_id, "does not exist");
         return;
     }
     auto dst_it = m_set_map().find(dst_id);
     if (dst_it == m_set_map().end()) {
-        tprintf(formats::SET_DOES_NOT_EXIST(), __func__, dst_id);
+        STATE_OF_SET(dst_id, "does not exist");
         return;
     }
 
