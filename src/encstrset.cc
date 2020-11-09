@@ -217,7 +217,7 @@ bool jnp1::encstrset_insert(unsigned long id,
     std::string cyphered_val = cypher(key, value);
 
     if (!m_set.insert(cyphered_val).second) {
-        STATE_OF_CYPHER(id, str_to_hex(cyphered_val), "was present");
+        STATE_OF_CYPHER(id, str_to_hex(cyphered_val), "was already present");
         return false;
     }
 
