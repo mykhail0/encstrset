@@ -1,11 +1,15 @@
+TE WAŻNE
 1) Constexpr i const w zwracanych typach funkcji.
 2) Co z C-stringami, które nie są null-terminated.
 3) Czy może być działanie zależne od debug (add_all: debug -> iterowanie po secie, ndebug -> dst.insert(src.begin(), src.end()))
 4) Wyjątki w cypher()?
-5) czy tak się powinno inicjalizować cerr? Czy wystarczy dać iostream w dobrym miejscu
-6) czy dobrze radzimy se ze stringami
-7) Czy te małe stringi zwracać przez referencję czy zostawić jak jest
-8) czy będziemy karani za niezwolnioną pamięć przy zmiennych globalnych
-9) czy debug może być w funkcji wyświetlającej
-10) iterowanie po stringu, patrz: tprintf
-11) czy trzeba robić str_to_hex() ładniej i bez zbędnej pamięci
+5) Czy pamięć może być niezwalniana? patrz: m_set_map
+6) czy tak się powinno inicjalizować cerr? Czy wystarczy dać iostream w dobrym miejscu
+7) co z warningiem w cypher;
+-------------------------------------------------------------------------------------------------------------------
+7) Jak iterować po stringu
+8) Czy te małe stringi zwracać przez referencję czy zostawić jak jest
+9) czy będziemy karani za niezwolnioną pamięć przy zmiennych globalnych
+10) czy debug może być w funkcji wyświetlającej
+11) iterowanie po stringu, patrz: tprintf
+12) czy trzeba robić str_to_hex() ładniej i bez zbędnej pamięci

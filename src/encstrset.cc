@@ -1,10 +1,12 @@
-// TODO string& s vs string &s
+//TODO co z tym includem
 #include "encstrset.h"
 #include <unordered_set>
 #include <unordered_map>
 #include <stdexcept>
 #include <iostream>
 #include <iomanip>
+
+//TODO I co z tym: w końcu z biblioteki przystosowany do c a nie do c++
 #include <cstring>
 
 namespace {
@@ -17,6 +19,7 @@ namespace {
     using encstrset = std::unordered_set<std::string>;
     using set_map = std::unordered_map<unsigned long, encstrset>;
 
+    // Represents the largest id of all existing sets.
     unsigned long largest_id = 0;
 
     namespace formats {
@@ -43,20 +46,19 @@ namespace {
             return is_present;
         }
 
-        std::string CYPHER_NOT_PRESENT() {
+        std::string CYPHER_IS_NOT_PRESENT() {
             static const std::string is_not_present(
                     "%: set #%, cypher \"%\" is not present\n");
             return is_not_present;
         }
 
-
-        std::string WAS_PRESENT() {
+        std::string CYPHER_WAS_PRESENT() {
             static const std::string was_present(
                     "%: set #%, cypher \"%\" was already present\n");
             return was_present;
         }
 
-        std::string WAS_NOT_PRESENT() {
+        std::string CYPHER_WAS_NOT_PRESENT() {
             static const std::string was_not_present(
                     "%: set #%, cypher \"%\" was not present\n");
             return was_not_present;
@@ -123,23 +125,39 @@ namespace {
     }
 
     // TODO Czy pamięć może być niezwalniana
+
+    // Global map that stores set's IDs as keys and sets as values.
     set_map &m_set_map() {
         static set_map *m_set_map_ptr = new set_map();
         return *m_set_map_ptr;
     }
 
     //TODO Czy taki sposób inicjalizowania get_cerr jest dobry
+
+    // Stores and returns 'std::cerr' variable.
     std::ostream &get_cerr() {
         static std::ios_base::Init init;
         return std::cerr;
     }
 
+    /*
+        Prints string 'format' on std::err.
+     */
     void tprintf(const std::string &format) {
         if (!debug)
             return;
         get_cerr() << format;
     }
 
+    /*
+        https://en.cppreference.com/w/cpp/language/parameter_pack
+        Function does anything only if 'debug' variable is equal to
+        'true'.
+        Parses 'format' string. For every character in the string,
+        if it is equal to '%' char prints 'value' parameter.
+        Otherwise, prints the character in format string.
+        Every character is printed using std::err.
+     */
     template<typename T, typename... Targs>
     void tprintf(const std::string &format, T value, Targs... Fargs) {
         if (!debug)
@@ -155,6 +173,12 @@ namespace {
         }
     }
 
+    /*
+        Returns string representation of 'p'.
+        If 'p' is a NULL pointer, it returns string 'NULL'.
+        Otherwise, it returns string value of 'p' between
+        double quotes chars.
+     */
     std::string param_str(const char *p) {
         if (p == nullptr)
             return formats::NULL_STRING();
@@ -273,7 +297,7 @@ bool jnp1::encstrset_insert(unsigned long id,
     std::string cyphered_val = cypher(key, value);
 
     if (m_set.find(cyphered_val) != m_set.end()) {
-        tprintf(formats::WAS_PRESENT(), __func__, id, str_to_hex(cyphered_val));
+        tprintf(formats::CYPHER_WAS_PRESENT(), __func__, id, str_to_hex(cyphered_val));
         return false;
     }
 
@@ -305,7 +329,7 @@ bool jnp1::encstrset_remove(unsigned long id,
 
     auto set_it = m_set.find(cyphered_val);
     if (set_it == m_set.end()) {
-        tprintf(formats::WAS_NOT_PRESENT(),
+        tprintf(formats::CYPHER_WAS_NOT_PRESENT(),
                 __func__, id, str_to_hex(cyphered_val));
         return false;
     }
@@ -336,7 +360,7 @@ bool jnp1::encstrset_test(unsigned long id,
 
     const encstrset &m_set = it->second;
     if (m_set.find(cyphered_val) == m_set.end()) {
-        tprintf(formats::CYPHER_NOT_PRESENT(),
+        tprintf(formats::CYPHER_IS_NOT_PRESENT(),
                 __func__, id, str_to_hex(cyphered_val));
         return false;
     }

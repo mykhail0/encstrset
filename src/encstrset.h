@@ -10,7 +10,6 @@
   #include <stdlib.h>
 #endif
 
-
 /*
       Tworzy nowy zbiór i zwraca jego identyfikator.
 */
