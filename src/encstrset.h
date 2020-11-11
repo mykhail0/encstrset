@@ -15,19 +15,19 @@ namespace jnp1 {
 #endif
 
 /*
-      Tworzy nowy zbiór i zwraca jego identyfikator.
+    Creates a new set and returns its id.
 */
     unsigned long encstrset_new();
 
 /*
-      Jeżeli istnieje zbiór o identyfikatorze id, usuwa go, a w przeciwnym
-      przypadku nie robi nic.
+    If there is a set with id equal to `id`, it is removed,
+    otherwise nothing happens.
 */
     void encstrset_delete(unsigned long id);
 
 /*
-      Jeżeli istnieje zbiór o identyfikatorze id, zwraca liczbę jego elementów,
-      a w przeciwnym przypadku zwraca 0.
+    If there is a set with id equal to `id`, its size is returned.
+    Otherwise returns 0.
 */
     size_t encstrset_size(unsigned long id);
 
@@ -57,8 +57,8 @@ namespace jnp1 {
     bool encstrset_test(unsigned long id, const char *value, const char *key);
 
 /*
-      Jeżeli istnieje zbiór o identyfikatorze id, usuwa wszystkie jego elementy,
-      a w przeciwnym przypadku nie robi nic.
+    If there is a set with id equal to `id`, all of its elements are deleted.
+    Otherwise nothing happens.
 */
     void encstrset_clear(unsigned long id);
 
