@@ -97,8 +97,6 @@ namespace {
         return null_string;
     }
 
-    //TODO sprawdzić działanie tej funkcji
-
     // Returns uppercase hex representation of a string
     std::string str_to_hex(const std::string &s) {
         if (s.empty())
