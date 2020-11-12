@@ -4,7 +4,6 @@
 #include <stdexcept>
 #include <iostream>
 #include <iomanip>
-
 #include <cassert>
 #include <cstring>
 
@@ -98,16 +97,21 @@ namespace {
         return null_string;
     }
 
+    //TODO sprawdzić działanie tej funkcji
+
     // Returns uppercase hex representation of a string
     std::string str_to_hex(const std::string &s) {
         if (s.empty())
             return s;
 
         std::ostringstream ret;
-        for (const char &c : s)
+        for (const char &c : s) {
             // https://stackoverflow.com/a/3381629
+            unsigned char c_unsigned = c;
             ret << std::hex << std::setfill('0')
-                << std::setw(2) << std::uppercase << (int) c << " ";
+                << std::setw(2) << std::uppercase <<  (unsigned int) c_unsigned << " ";
+        }
+
         std::string str = ret.str();
         return str.erase(str.size() - 1);
     }
