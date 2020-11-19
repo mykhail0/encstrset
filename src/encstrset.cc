@@ -15,78 +15,78 @@ namespace {
 #endif
 
 // Prints function call for functions that recieve no arguments.
-#define FUNC_WITH_NO_ARGS() do {\
-    if (debug) {\
-      std::cerr << __func__ << "()" << std::endl;\
-    }\
+#define FUNC_WITH_NO_ARGS() do { \
+    if (debug) { \
+      std::cerr << __func__ << "()" << std::endl; \
+    } \
   } while (false)
 
 // Prints function call for functions that recieve one argument.
-#define FUNC_WITH_ONE_ARG(arg) do {\
-    if (debug) {\
-      std::cerr << __func__ << "(" << arg << ")" << std::endl;\
-    }\
+#define FUNC_WITH_ONE_ARG(arg) do { \
+    if (debug) { \
+      std::cerr << __func__ << "(" << arg << ")" << std::endl; \
+    } \
   } while (false)
 
 // Prints function call for functions that recieve two arguments.
-#define FUNC_WITH_TWO_ARGS(arg1, arg2) do {\
-    if (debug) {\
-      std::cerr << __func__ << "(" << arg1 << ", " << arg2 << ")" << std::endl;\
-    }\
+#define FUNC_WITH_TWO_ARGS(arg1, arg2) do { \
+    if (debug) { \
+      std::cerr << __func__ << "(" << arg1 << ", " << arg2 << ")" << std::endl; \
+    } \
   } while (false)
 
 // Prints function call for functions that recieve three arguments.
-#define FUNC_WITH_THREE_ARGS(arg1, arg2, arg3) do {\
-    if (debug) {\
-      std::cerr << __func__ << "(" << arg1 << ", " << arg2 << ", " << arg3\
-                << ")" << std::endl;\
-    }\
+#define FUNC_WITH_THREE_ARGS(arg1, arg2, arg3) do { \
+    if (debug) { \
+      std::cerr << __func__ << "(" << arg1 << ", " << arg2 << ", " << arg3 \
+                << ")" << std::endl; \
+    } \
   } while (false)
 
 // Prints the state of set_id sate. state describes the state to be printed.
-#define STATE_OF_SET(set_id, state) do {\
-    if (debug) {\
-      std::cerr << __func__ << ": set #" << set_id << " " << state\
-                << std::endl;\
-    }\
+#define STATE_OF_SET(set_id, state) do { \
+    if (debug) { \
+      std::cerr << __func__ << ": set #" << set_id << " " << state \
+                << std::endl; \
+    } \
   } while (false)
 
 // Prints the state of cypher in set_id sate.
 // state describes the state to be printed.
-#define STATE_OF_CYPHER(set_id, cypher, state) do {\
-    if (debug) {\
-      std::cerr << __func__ << ": set #" << set_id << ", cypher \"" << cypher\
-                << "\" "<< state << std::endl;\
-    }\
+#define STATE_OF_CYPHER(set_id, cypher, state) do { \
+    if (debug) { \
+      std::cerr << __func__ << ": set #" << set_id << ", cypher \"" << cypher \
+                << "\" "<< state << std::endl; \
+    } \
   } while (false)
 
-#define CYPHER_COPIED_PRESENT(func_name, cypher, set_id) do {\
-    if (debug) {\
-      std::cerr << func_name << ": copied cypher \"" << cypher\
-                << "\" was already present in set #" << set_id << std::endl;\
-    }\
+#define CYPHER_COPIED_PRESENT(func_name, cypher, set_id) do { \
+    if (debug) { \
+      std::cerr << func_name << ": copied cypher \"" << cypher \
+                << "\" was already present in set #" << set_id << std::endl; \
+    } \
   } while (false)
 
-#define CYPHER_COPIED(func_name, cypher, set_src, set_dst) do {\
-    if (debug) {\
-      std::cerr << func_name << ": cypher \"" << cypher\
-                << "\" copied from set #" << set_src << " to set #" << set_dst\
-                << std::endl;\
-    }\
+#define CYPHER_COPIED(func_name, cypher, set_src, set_dst) do { \
+    if (debug) { \
+      std::cerr << func_name << ": cypher \"" << cypher \
+                << "\" copied from set #" << set_src << " to set #" << set_dst \
+                << std::endl; \
+    } \
   } while (false)
 
-#define INVALID_VALUE(value) do {\
-    if (debug) {\
-      std::cerr << __func__ << ": invalid value (" << value << ")"\
-                << std::endl;\
-    }\
+#define INVALID_VALUE(value) do { \
+    if (debug) { \
+      std::cerr << __func__ << ": invalid value (" << value << ")" \
+                << std::endl; \
+    } \
   } while (false)
 
-#define SIZE_OF_SET(set_id, elements) do {\
-    if (debug) {\
-      std::cerr << __func__ << ": set #" << set_id << " contains " << elements\
-                << " element(s)" << std::endl;\
-    }\
+#define SIZE_OF_SET(set_id, elements) do { \
+    if (debug) { \
+      std::cerr << __func__ << ": set #" << set_id << " contains " << elements \
+                << " element(s)" << std::endl; \
+    } \
   } while (false)
 
     using encstrset = std::unordered_set<std::string>;
@@ -137,11 +137,10 @@ namespace {
                  unsigned long src_id, unsigned long dst_id) {
         static const std::string copy_func_name = "encstrset_copy";
         for (const auto &str : src) {
-            std::string hex_val = str_to_hex(str);
             if (dst.insert(str).second)
-                CYPHER_COPIED(copy_func_name, hex_val, src_id, dst_id);
+                CYPHER_COPIED(copy_func_name, str_to_hex(str), src_id, dst_id);
             else
-                CYPHER_COPIED_PRESENT(copy_func_name, hex_val, dst_id);
+                CYPHER_COPIED_PRESENT(copy_func_name, str_to_hex(str), dst_id);
         }
     }
 
@@ -232,13 +231,12 @@ bool jnp1::encstrset_insert(unsigned long id,
     encstrset &m_set = it->second;
     std::string cyphered_val = cypher(key, value);
 
-    std::string hex_val = str_to_hex(cyphered_val);
     if (!m_set.insert(cyphered_val).second) {
-        STATE_OF_CYPHER(id, hex_val, "was already present");
+        STATE_OF_CYPHER(id, str_to_hex(cyphered_val), "was already present");
         return false;
     }
 
-    STATE_OF_CYPHER(id, hex_val, "inserted");
+    STATE_OF_CYPHER(id, str_to_hex(cyphered_val), "inserted");
     return true;
 }
 
@@ -260,13 +258,12 @@ bool jnp1::encstrset_remove(unsigned long id,
     std::string cyphered_val = cypher(key, value);
     encstrset &m_set = it->second;
 
-    std::string hex_val = str_to_hex(cyphered_val);
     if (!m_set.erase(cyphered_val)) { // There was no cyphered_val in the set.
-        STATE_OF_CYPHER(id, hex_val, "was not present");
+        STATE_OF_CYPHER(id, str_to_hex(cyphered_val), "was not present");
         return false;
     }
 
-    STATE_OF_CYPHER(id, hex_val, "removed");
+    STATE_OF_CYPHER(id, str_to_hex(cyphered_val), "removed");
     return true;
 }
 
@@ -288,13 +285,12 @@ bool jnp1::encstrset_test(unsigned long id,
     std::string cyphered_val = cypher(key, value);
 
     const encstrset &m_set = it->second;
-    std::string hex_val = str_to_hex(cyphered_val);
     if (m_set.find(cyphered_val) == m_set.end()) {
-        STATE_OF_CYPHER(id, hex_val, "is not present");
+        STATE_OF_CYPHER(id, str_to_hex(cyphered_val), "is not present");
         return false;
     }
 
-    STATE_OF_CYPHER(id, hex_val, "is present");
+    STATE_OF_CYPHER(id, str_to_hex(cyphered_val), "is present");
     return true;
 }
 
